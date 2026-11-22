@@ -75,51 +75,25 @@
             tg.expand();
         }
 
-        let score = 0;
         const scoreElement = document.getElementById('score');
         const button = document.getElementById('click-btn');
+        
+        // 1. Загружаем сохраненный счетчик из памяти устройства
+        let score = parseInt(localStorage.getItem('myClickerScore')) || 0;
+        scoreElement.textContent = score;
 
-        // 1. Функция загрузки прогресса из облака Telegram
-        async function loadProgress() {
-            if (tg && tg.CloudStorage) {
-                try {
-                    const savedScore = await tg.CloudStorage.getItem('clicker_score');
-                    if (savedScore) {
-                        score = parseInt(savedScore) || 0;
-                        scoreElement.textContent = score;
-                    }
-                } catch (e) {
-                    console.log('Ошибка загрузки прогресса:', e);
-                }
-            }
-        }
-
-        // 2. Функция сохранения прогресса в облако Telegram
-        async function saveProgress() {
-            if (tg && tg.CloudStorage) {
-                try {
-                    await tg.CloudStorage.setItem('clicker_score', score.toString());
-                } catch (e) {
-                    console.log('Ошибка сохранения прогресса:', e);
-                }
-            }
-        }
-
-        // 3. Обработчик клика
+        // 2. Обработчик клика
         button.addEventListener('click', () => {
             score++;
             scoreElement.textContent = score;
             
+            // Сохраняем в память устройства
+            localStorage.setItem('myClickerScore', score);
+            
             if (tg) {
                 tg.HapticFeedback.impactOccurred('light');
             }
-            
-            // Сохраняем результат после каждого клика
-            saveProgress();
         });
-
-        // 4. При запуске игры сразу загружаем сохраненный счетчик
-        loadProgress();
     </script>
 </body>
 </html>
