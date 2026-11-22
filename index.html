@@ -2,211 +2,269 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Off-White x Max Loiko</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Clicker Pro</title>
     <style>
-        /* Базовые стили */
+        :root {
+            --bg-color: #1a1a24;
+            --main-color: #ffaa00;
+            --text-color: #ffffff;
+        }
+
         body {
-            background-color: #121212; /* Темный фон, как на твоих скринах */
-            color: white;
-            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
             height: 100vh;
-            margin: 0;
+            overflow: hidden;
+            user-select: none; /* Запрет выделения текста */
+        }
+
+        /* Верхняя панель (Энергия) */
+        .top-bar {
+            width: 100%;
             padding: 20px;
             box-sizing: border-box;
-        }
-
-        /* Карточка товара */
-        .product-card {
-            background-color: #1e1e1e;
-            border-radius: 20px;
-            width: 100%;
-            max-width: 350px;
-            overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            border: 1px solid #333;
-            transition: transform 0.3s ease;
-        }
-
-        .product-card:hover {
-            transform: translateY(-5px);
-        }
-
-        /* Блок с фото */
-        .image-container {
-            position: relative;
-            width: 100%;
-            height: 350px;
-            background-color: #2a2a2a; /* Заглушка, если фото не загрузится */
             display: flex;
             justify-content: center;
-            align-items: center;
+        }
+
+        .energy-container {
+            width: 80%;
+            background: #2a2a35;
+            border-radius: 10px;
+            height: 20px;
+            position: relative;
             overflow: hidden;
         }
 
-        .image-container img {
-            width: 100%;
+        .energy-bar {
             height: 100%;
-            object-fit: cover;
-            transition: transform 0.5s ease;
+            width: 100%;
+            background: linear-gradient(90deg, #ffaa00, #ffdd00);
+            transition: width 0.3s ease;
         }
 
-        .product-card:hover .image-container img {
-            transform: scale(1.05); /* Легкий зум при наведении */
-        }
-
-        /* Бейдж "Хит" */
-        .badge {
+        .energy-text {
             position: absolute;
-            top: 15px;
-            left: 15px;
-            background-color: #ff0055;
-            color: white;
-            padding: 5px 12px;
-            border-radius: 20px;
+            width: 100%;
+            text-align: center;
+            top: 50%;
+            transform: translateY(-50%);
             font-size: 12px;
             font-weight: bold;
-            letter-spacing: 1px;
-            z-index: 10;
+            color: #000;
         }
 
-        /* Информация о товаре */
-        .product-info {
-            padding: 20px;
+        /* Счетчик монет */
+        .score-container {
+            margin-top: 20px;
+            text-align: center;
         }
 
-        .brand {
-            font-size: 12px;
+        .score-title {
+            font-size: 16px;
             color: #888;
-            text-transform: uppercase;
-            letter-spacing: 1px;
             margin-bottom: 5px;
         }
 
-        .title {
-            font-size: 22px;
+        .score {
+            font-size: 48px;
             font-weight: 900;
-            margin: 0 0 10px 0;
-            text-transform: uppercase;
-            font-style: italic; /* В стиле Off-White */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
         }
 
-        .price {
+        .coin-icon {
+            width: 40px;
+            height: 40px;
+            background: gold;
+            border-radius: 50%;
+            display: inline-block;
+            box-shadow: 0 0 15px gold;
+        }
+
+        /* Главная кнопка (Кнопка-хомяк) */
+        .click-area {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+        }
+
+        .click-btn {
+            width: 250px;
+            height: 250px;
+            background: radial-gradient(circle, #3a3a45, #1e1e24);
+            border: 4px solid var(--main-color);
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 0 30px rgba(255, 170, 0, 0.3);
+            transition: transform 0.1s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 80px; /* Сюда можно вставить эмодзи или картинку */
+        }
+
+        /* Анимация нажатия */
+        .click-btn:active {
+            transform: scale(0.95);
+            box-shadow: 0 0 50px rgba(255, 170, 0, 0.6);
+        }
+
+        /* Всплывающие цифры (+1) */
+        .floating-text {
+            position: absolute;
+            color: white;
             font-size: 24px;
             font-weight: bold;
-            color: #00ff88;
-            margin-bottom: 20px;
+            pointer-events: none;
+            animation: floatUp 1s ease-out forwards;
+            z-index: 100;
         }
 
-        /* Выбор размера */
-        .sizes {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
+        @keyframes floatUp {
+            0% { opacity: 1; transform: translateY(0) scale(1); }
+            100% { opacity: 0; transform: translateY(-100px) scale(1.5); }
         }
 
-        .size-btn {
-            background: transparent;
-            border: 1px solid #555;
-            color: white;
-            padding: 10px 15px;
-            border-radius: 8px;
-           бира cursor: pointer;
-            font-weight: bold;
-            transition: all 0.2емs;
-        }
-
-        .size-btn:hover {
-            border-color: класс #00ff88;
-        }
-
-        .size-btn.active {
-            background: white;
-            color: black;
-            border-color: white;
-        }
-
-        /* Кнопка заказа */
-        .buy-btn {
+        /* Нижнее меню (Заглушки) */
+        .bottom-menu {
             width: 100%;
-            padding: 15px;
-            background: white;
-            color: black;
-            border: none;
-            border-radius: 10px;
-            font-size: 16px;
-            font-weight: bold;
-            text-transform: uppercase;
+            display: flex;
+            justify-content: space-around;
+            padding: 15px 0;
+            background: #1e1e24;
+            border-top: 1px solid #333;
+        }
+
+        .menu-item {
+            text-align: center;
+            font-size: 12px;
+            color: #888;
             cursor: pointer;
-            transition: background 0.3s;
         }
-
-        .buy-btn:hover {
-            background: #ddd;
-        }
-
-        .buy-btn:active {
-            transform: scale(0.98);
+        
+        .menu-item.active {
+            color: var(--main-color);
         }
     </style>
 </head>
 <body>
 
-    <div class="product-card">
-        <div class="image-container">
-            <!-- Замени ссылку ниже на свое фото -->
-            <img src="https://images.unsplash.com/photo-1556821840-3a63f95609a7?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Off-White Hoodie">
-            <div class="badge">🔥 ХИТ</div>
-        </div>
-        
-        <div class="product-info">
-            <div class="brand">Off-White ™</div>
-            <h1 class="title">Max Loiko Edition</h1>
-            <div class="price">150 BYN</div>
-
-            <div class="sizes">
-                <button class="size-btn" onclick="selectSize(this)">S</button>
-                <button class="size-btn active" onclick="selectSize(this)">M</button>
-                <button class="size-btn" onclick="selectSize(this)">L</button>
-                <button class="size-btn" onclick="selectSize(this)">XL</button>
-            </div>
-
-            <button class="buy-btn" onclick="orderItem()">Заказать</button>
+    <!-- Энергия -->
+    <div class="top-bar">
+        <div class="energy-container">
+            <div class="energy-bar" id="energyBar"></div>
+            <div class="energy-text" id="energyText">1000 / 1000</div>
         </div>
     </div>
 
-    <script>
-        let selectedSize = 'M'; // Размер по умолчанию
+    <!-- Монеты -->
+    <div class="score-container">
+        <div class="score-title">Заработано монет</div>
+        <div class="score">
+            <div class="coin-icon"></div>
+            <span id="score">0</span>
+        </div>
+    </div>
 
-        // Функция выбора размера
-        function selectSize(button) {
-            // У 'active' у всех кнопок
-            document.querySelectorAll('.size-btn').forEach(btn => btn.classList.remove('active'));
-            // Добавляем класс 'active' нажатой кнопке
-            button.classList.add('active');
-            // Запоминаем выбранный размер
-            selectedSize = button.innerText;
+    <!-- Игровое поле -->
+    <div class="click-area" id="clickArea">
+        <button class="click-btn" id="clickBtn">
+            👆
+        </button>
+    </div>
+
+    <!-- Нижнее меню -->
+    <div class="bottom-menu">
+        <div class="menu-item active">Тапать</div>
+        <div class="menu-item">Апгрейды</div>
+        <div class="menu-item">Друзья</div>
+    </div>
+
+    <script>
+        // --- ДАННЫЕ ИГРЫ ---
+        let score = localStorage.getItem('clickerScore') ? parseInt(localStorage.getItem('clickerScore')) : 0;
+        let maxEnergy = 1000;
+        let energy = maxEnergy;
+        let clickPower = 1; // Сколько монет за клик
+        let energyCost = 10; // Сколько энергии тратится за клик
+
+        // Элементы на странице
+        const scoreEl = document.getElementById('score');
+        const clickBtn = document.getElementById('clickBtn');
+        const clickArea = document.getElementById('clickArea');
+        const energyBar = document.getElementById('energyBar');
+        const energyText = document.getElementById('energyText');
+
+        // Обновляем интерфейс при старте
+        scoreEl.innerText = score;
+        updateEnergy();
+
+        // --- ЛОГИКА КЛИКА ---
+        clickBtn.addEventListener('click', (e) => {
+            if (energy >= energyCost) {
+                // Вычитаем энергию, добавляем монеты
+                energy -= energyCost;
+                score += clickPower;
+
+                // Сохраняем в память
+                localStorage.setItem('clickerScore', score);
+
+                // Обновляем текст
+                scoreEl.innerText = score;
+                updateEnergy();
+
+                // Создаем всплывающий текст "+1"
+                createFloatingText(e.clientX, e.clientY);
+
+            } else {
+                // Если энергия кончилась
+                clickBtn.style.borderColor = "#ff0000";
+                setTimeout(() => clickBtn.style.borderColor = "var(--main-color)", 500);
+            }
+        });
+
+        // --- ВОССТАНОВЛЕНИЕ ЭНЕРГИИ ---
+        // Каждые 1.5 секунды восстанавливаем 10 энергии (бесконечный цикл)
+        setInterval(() => {
+            if (energy < maxEnergy) {
+                energy += 5;
+                if (energy > maxEnergy) energy = maxEnergy;
+                updateEnergy();
+            }
+        }, 1000);
+
+        // --- ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ---
+        function updateEnergy() {
+            const percent = (energy / maxEnergy) * 100;
+            energyBar.style.width = percent + '%';
+            energyText.innerText = `${energy} / ${maxEnergy}`;
         }
 
-        // Функция заказа (переход в Telegram)
-        function orderItem() {
-            // ВСТАВЬ СЮДА СВОЙ НИКНЕЙМ В ТЕЛЕГРАМЕ (без @)
-            const telegramUsername = 'твой_ник_в_тг'; 
+        function createFloatingText(x, y) {
+            const text = document.createElement('div');
+            text.className = 'floating-text';
+            text.innerText = `+${clickPower}`;
+            text.style.left = x + 'px';
+            text.style.top = y + 'px';
+            // Небольшой разброс, чтобы цифры не спавнились в одну точку
+            text.style.transform = `translate(${Math.random() * 40 - 20}px, ${Math.random() * 40 - 20}px)`;
             
-            // Формируем текст сообщения
-            const message = `Привет! Хочу заказать Off-White Max Loiko. Размер: ${selectedSize}. Цена: 150 BYN.`;
+            document.body.appendChild(text);
             
-            // Кодируем текст для ссылки
-            const encodedMessage = encodeURIComponent(message);
-            
-            // Ссылка на Telegram (откроется приложение, если установлено)
-            const telegramUrl = `https://t.me/${telegramUsername}?text=${encodedMessage}`;
-            
-            // Открываем ссылку
-            window.open(telegramUrl, '_blank');
+            // Удаляем элемент через 1 секунду (после анимации)
+            setTimeout(() => text.remove(), 1000);
         }
     </script>
 </body>
