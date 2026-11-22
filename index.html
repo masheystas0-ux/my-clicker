@@ -22,10 +22,9 @@
             background-color: #222;
         }
 
-        /* Верхний блок со счетчиком (сдвинут вниз) */
+        /* Верхний блок со счетчиком */
         #header {
             background: rgba(0, 0, 0, 0.8);
-            /* Добавляем отступ сверху, чтобы не налезало на кнопки Telegram */
             padding: 15px; 
             padding-top: calc(15px + env(safe-area-inset-top, 40px)); 
             text-align: center;
@@ -67,16 +66,16 @@
             display: flex;
         }
 
-        /* Вкладка Кликер (уменьшили кнопку) */
+        /* Вкладка Кликер */
         #click-btn {
-            width: 140px; /* Было 180px */
-            height: 140px; /* Было 180px */
+            width: 140px;
+            height: 140px;
             border-radius: 50%;
             border: 4px solid #FFD700;
             background: rgba(255, 215, 0, 0.2);
             backdrop-filter: blur(5px);
             color: #fff;
-            font-size: 22px; /* Чуть уменьшили шрифт */
+            font-size: 22px;
             font-weight: bold;
             box-shadow: 0 10px 30px rgba(0,0,0,0.6);
             cursor: pointer;
@@ -85,7 +84,7 @@
             align-items: center;
             justify-content: center;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
-            margin-bottom: 30px; /* Отодвинули от нижнего меню */
+            margin-bottom: 30px;
         }
         #click-btn:active { transform: scale(0.9); }
 
@@ -134,7 +133,7 @@
             padding: 10px;
             border-radius: 15px;
             margin: 15px 0;
-            font-size: 40px; /* Уменьшили эмодзи */
+            font-size: 40px;
         }
 
         .slot {
@@ -174,7 +173,6 @@
             background: rgba(0, 0, 0, 0.95);
             border-top: 2px solid #333;
             padding: 10px 0;
-            /* Безопасная зона для iPhone снизу */
             padding-bottom: max(10px, env(safe-area-inset-bottom)); 
         }
 
@@ -183,7 +181,7 @@
             background: none;
             border: none;
             color: #888;
-            font-size: 12px; /* Чуть уменьшили текст */
+            font-size: 12px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -201,7 +199,6 @@
     </style>
 </head>
 <body>
-    <!-- Верхний счетчик -->
     <div id="header">
         <div id="score-container">
             <span>🪙</span>
@@ -209,14 +206,11 @@
         </div>
     </div>
 
-    <!-- Основной контент -->
     <div id="main-content">
-        <!-- Вкладка 1: Кликер -->
         <div id="tab-clicker" class="tab-content active">
             <button id="click-btn">+1 🪙</button>
         </div>
 
-        <!-- Вкладка 2: Магазин -->
         <div id="tab-shop" class="tab-content">
             <div class="upgrade-item">
                 <span>Сила клика: <b id="click-power-lvl">1</b></span>
@@ -228,7 +222,6 @@
             </div>
         </div>
 
-        <!-- Вкладка 3: Казино -->
         <div id="tab-casino" class="tab-content">
             <div id="slot-machine">
                 <h2>🎰 Казино</h2>
@@ -246,7 +239,6 @@
         </div>
     </div>
 
-    <!-- Нижняя навигация -->
     <div id="nav-bar">
         <button class="nav-btn active" onclick="switchTab('clicker')">
             <span>🏠</span> Кликер
@@ -271,14 +263,18 @@
         let clickPower = parseInt(localStorage.getItem('clickPower')) || 1;
         let autoClickLevel = parseInt(localStorage.getItem('autoClickLevel')) || 0;
         
-        let clickPowerPrice = parseInt(localStorage.getItem('clickPowerPrice')) || 10;
-        let autoClickPrice = parseInt(localStorage.getItem('autoClickPrice')) || 50;
+        // ВОТ ГЛАВНОЕ ИСПРАВЛЕНИЕ:
+        // Если в памяти есть цена, берем её. Если нет (null), ставим 10.
+        let savedClickPrice = localStorage.getItem('clickPowerPrice');
+        let clickPowerPrice = savedClickPrice !== null ? parseInt(savedClickPrice) : 10;
+        
+        let savedAutoPrice = localStorage.getItem('autoClickPrice');
+        let autoClickPrice = savedAutoPrice !== null ? parseInt(savedAutoPrice) : 50;
 
         // --- ЭЛЕМЕНТЫ ---
         const scoreElement = document.getElementById('score');
         const clickBtn = document.getElementById('click-btn');
         
-        // Магазин
         const buyClickPowerBtn = document.getElementById('buy-click-power');
         const buyAutoClickBtn = document.getElementById('buy-auto-click');
         const clickPowerLvlEl = document.getElementById('click-power-lvl');
@@ -286,7 +282,6 @@
         const clickPowerPriceEl = document.getElementById('click-power-price');
         const autoClickPriceEl = document.getElementById('auto-click-price');
 
-        // Казино
         const spinBtn = document.getElementById('spin-btn');
         const slots = document.querySelectorAll('.slot');
         const casinoResult = document.getElementById('casino-result');
@@ -295,16 +290,10 @@
 
         // --- НАВИГАЦИЯ ---
         window.switchTab = function(tabName) {
-            document.querySelectorAll('.tab-content').forEach(tab => {
-                tab.classList.remove('active');
-            });
-            document.querySelectorAll('.nav-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
-
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
             document.getElementById('tab-' + tabName).classList.add('active');
             event.currentTarget.classList.add('active');
-            
             if (tg) tg.HapticFeedback.selectionChanged();
         }
 
