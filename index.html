@@ -3,15 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Star Clicker Pro</title>
+    <title>Star Clicker Pro Max</title>
     <style>
         :root {
-            --bg-color: #0a0f18; /* Очень темный, почти черный синий */
+            --bg-color: #0a0f18;
             --ice-blue: #00d2ff;
             --deep-blue: #0055ff;
             --text-color: #ffffff;
             --star-gold: #ffcc00;
+            --panel-bg: #131a26;
         }
+
+        * { box-sizing: border-box; }
 
         body {
             margin: 0;
@@ -24,290 +27,151 @@
             height: 100vh;
             overflow: hidden;
             user-select: none;
-            
-            /* Неоновые узоры на фоне */
             background-image: 
-                radial-gradient(circle at 15% 50%, rgba(0, 210, 255, 0.08), transparent 25%),
-                radial-gradient(circle at 85% 30%, rgba(0, 85, 255, 0.08), transparent 25%);
-            background-size: 100% 100%;
+                radial-gradient(circle at 15% 50%, rgba(0, 210, 255, 0.1), transparent 30%),
+                radial-gradient(circle at 85% 30%, rgba(0, 85, 255, 0.1), transparent 30%);
         }
 
-        /* --- ЛЕДЯНЫЕ ПОЛОСКИ ПО КРАЯМ С ЛАМПОЧКАМИ --- */
+        /* --- ЛЕДЯНЫЕ ПОЛОСКИ --- */
         .ice-edge {
             position: fixed;
-            top: 0;
-            bottom: 0;
-            width: 15px;
+            top: 0; bottom: 0; width: 12px;
             background: linear-gradient(to bottom, #00d2ff, #0055ff, #00d2ff);
-            box-shadow: 0 0 15px var(--ice-blue);
+            box-shadow: 0 0 15px var(--ice-blue), inset 0 0 5px #fff;
             z-index: 50;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-evenly;
-            align-items: center;
+            display: flex; flex-direction: column; justify-content: space-evenly; align-items: center;
         }
-
-        .ice-edge.left { left: 0; border-right: 2px solid #fff; }
-        .ice-edge.right { right: 0; border-left: 2px solid #fff; }
-
-        /* Лампочки на полосках */
+        .ice-edge.left { left: 0; }
+        .ice-edge.right { right: 0; }
         .bulb {
-            width: 6px;
-            height: 6px;
-            background-color: #fff;
-            border-radius: 50%;
+            width: 6px; height: 6px; background-color: #fff; border-radius: 50%;
             box-shadow: 0 0 10px #fff, 0 0 20px var(--ice-blue);
             animation: blink 2s infinite alternate;
         }
-
-        /* Задержка мигания для разных лампочек */
         .bulb:nth-child(even) { animation-delay: 1s; }
-        
-        @keyframes blink {
-            0% { opacity: 0.3; box-shadow: 0 0 5px #fff; }
-            100% { opacity: 1; box-shadow: 0 0 15px #fff, 0 0 25px var(--ice-blue); }
-        }
+        @keyframes blink { 0% { opacity: 0.3; } 100% { opacity: 1; } }
 
-        /* --- ВЕРХНЯЯ ПАНЕЛЬ (ЭНЕРГИЯ) --- */
-        .top-bar {
-            width: 100%;
-            padding: 20px;
-            box-sizing: border-box;
+        /* --- ВЕРХНЯЯ ПАНЕЛЬ --- */
+        .header {
+            padding: 15px 20px;
             display: flex;
             justify-content: center;
-            margin-top: 10px;
+            z-index: 10;
         }
-
         .energy-container {
-            width: 80%;
-            background: rgba(0, 0, 0, 0.5);
-            border-radius: 10px;
-            height: 22px;
-            position: relative;
-            overflow: hidden;
-            border: 1px solid var(--ice-blue);
+            width: 80%; background: #000;
+            border-radius: 20px; height: 24px; position: relative; overflow: hidden;
+            border: 2px solid #223; box-shadow: inset 0 3px 5px rgba(0,0,0,0.8);
         }
-
         .energy-bar {
-            height: 100%;
-            width: 100%;
-            background: linear-gradient(90deg, #0055ff, #00d2ff);
+            height: 100%; width: 100%;
+            background: linear-gradient(90deg, var(--deep-blue), var(--ice-blue));
             transition: width 0.3s ease;
             box-shadow: 0 0 10px var(--ice-blue);
         }
-
         .energy-text {
-            position: absolute;
-            width: 100%;
-            text-align: center;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 12px;
-            font-weight: bold;
-            color: #fff;
-            text-shadow: 1px 1px 2px #000;
+            position: absolute; width: 100%; text-align: center; top: 50%; transform: translateY(-50%);
+            font-size: 12px; font-weight: bold; color: #fff; text-shadow: 1px 1px 2px #000;
         }
 
-        /* --- СЧЕТЧИК ЗВЕЗД --- */
-        .score-container {
-            margin-top: 10px;
-            text-align: center;
-            z-index: 10;
+        /* --- БАЛАНС --- */
+        .balance-container {
+            text-align: center; margin-top: 10px; z-index: 10;
+            display: flex; flex-direction: column; align-items: center;
         }
-
-        .score-title {
-            font-size: 14px;
-            color: var(--ice-blue);
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            margin-bottom: 5px;
-            text-shadow: 0 0 5px var(--ice-blue);
+        .score-title { font-size: 14px; color: #889; text-transform: uppercase; letter-spacing: 2px; }
+        .score-display {
+            font-size: 52px; font-weight: 900; display: flex; align-items: center; gap: 15px;
+            text-shadow: 0 4px 10px rgba(0,0,0,0.5);
         }
+        .coin-star { width: 50px; height: 50px; filter: drop-shadow(0 5px 10px rgba(255,204,0,0.4)); }
 
-        .score {
-            font-size: 48px;
-            font-weight: 900;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
+        /* --- ЭКРАНЫ (ВКЛАДКИ) --- */
+        .screen { display: none; flex: 1; flex-direction: column; align-items: center; justify-content: center; z-index: 10; padding: 20px;}
+        .screen.active { display: flex; }
 
-        /* Монетка в форме звезды (через SVG) */
-        .coin-star {
-            width: 50px;
-            height: 50px;
-            filter: drop-shadow(0 0 10px var(--star-gold));
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
-        }
-
-        /* --- КНОПКА КЛИКА --- */
-        .click-area {
-            flex: 1;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            width: 100%;
-            z-index: 10;
-        }
-
+        /* Кнопка Клика */
         .click-btn {
-            width: 220px;
-            height: 220px;
-            background: radial-gradient(circle, #1a2a40 0%, #0a0f18 100%);
+            width: 220px; height: 220px; border-radius: 50%; cursor: pointer;
+            background: linear-gradient(145deg, #1a2a40, #0a0f18);
             border: 3px solid var(--ice-blue);
-            border-radius: 50%;
-            cursor: pointer;
-            box-shadow: 0 0 30px rgba(0, 210, 255, 0.2), inset 0 0 20px rgba(0, 210, 255, 0.2);
-            transition: transform 0.1s;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 80px;
-            position: relative;
+            /* Объемная тень */
+            box-shadow: 0 15px 25px rgba(0,0,0,0.6), inset 0 5px 15px rgba(255,255,255,0.1), 0 0 30px rgba(0, 210, 255, 0.2);
+            transition: all 0.1s; display: flex; justify-content: center; align-items: center; font-size: 80px;
         }
-
         .click-btn:active {
-            transform: scale(0.95);
-            box-shadow: 0 0 50px rgba(0, 210, 255, 0.6), inset 0 0 30px rgba(0, 210, 255, 0.6);
+            transform: translateY(5px); /* Кнопка вдавливается */
+            box-shadow: 0 5px 10px rgba(0,0,0,0.6), inset 0 5px 15px rgba(0,0,0,0.5), 0 0 50px rgba(0, 210, 255, 0.4);
         }
 
+        /* --- ЭКРАН АПГРЕЙДОВ --- */
+        .list-container { width: 100%; max-width: 400px; height: 100%; overflow-y: auto; padding-bottom: 80px; }
+        .list-item {
+            background: linear-gradient(135deg, var(--panel-bg), #0d131f);
+            border-radius: 15px; padding: 15px; margin-bottom: 15px;
+            display: flex; align-items: center; justify-content: space-between;
+            box-shadow: 0 8px 15px rgba(0,0,0,0.4), inset 0 1px 1px rgba(255,255,255,0.05);
+            border-left: 4px solid var(--deep-blue);
+        }
+        .item-info { flex: 1; }
+        .item-title { font-weight: bold; font-size: 16px; margin-bottom: 4px; }
+        .item-desc { font-size: 12px; color: #889; }
+        .item-price { color: var(--star-gold); font-weight: bold; font-size: 14px; margin-top: 5px; }
+        .buy-btn {
+            background: linear-gradient(180deg, var(--ice-blue), var(--deep-blue));
+            color: white; border: none; padding: 10px 15px; border-radius: 10px;
+            font-weight: bold; cursor: pointer; box-shadow: 0 4px 0 #0033aa; /* 3D эффект кнопки */
+            transition: 0.1s; min-width: 80px;
+        }
+        .buy-btn:active { transform: translateY(4px); box-shadow: 0 0 0 #0033aa; }
+        .buy-btn:disabled { background: #333; box-shadow: 0 4px 0 #111; color: #666; cursor: not-allowed; }
+
+        /* --- НИЖНЕЕ МЕНЮ --- */
+        .bottom-menu {
+            position: absolute; bottom: 0; width: 100%; display: flex; justify-content: space-around;
+            padding: 15px 10px; background: rgba(13, 19, 31, 0.95); backdrop-filter: blur(10px);
+            border-top: 1px solid #223; z-index: 100; box-shadow: 0 -5px 20px rgba(0,0,0,0.5);
+        }
+        .menu-item {
+            text-align: center; font-size: 12px; color: #667; cursor: pointer; font-weight: bold;
+            padding: 5px 10px; border-radius: 8px; transition: 0.3s;
+        }
+        .menu-item.active { color: var(--ice-blue); background: rgba(0, 210, 255, 0.1); text-shadow: 0 0 10px var(--ice-blue); }
+
+        /* Всплывающий текст */
         .floating-text {
-            position: absolute;
-            color: var(--star-gold);
-            font-size: 24px;
-            font-weight: 900;
-            pointer-events: none;
-            animation: floatUp 1s ease-out forwards;
-            z-index: 100;
-            text-shadow: 0 0 5px var(--star-gold);
+            position: absolute; color: var(--star-gold); font-size: 24px; font-weight: 900;
+            pointer-events: none; animation: floatUp 1s ease-out forwards; z-index: 200;
+            text-shadow: 0 2px 5px #000;
         }
-
         @keyframes floatUp {
             0% { opacity: 1; transform: translateY(0) scale(1); }
             100% { opacity: 0; transform: translateY(-100px) scale(1.5); }
         }
 
-        /* --- НИЖНЕЕ МЕНЮ --- */
-        .bottom-menu {
-            width: 100%;
-            display: flex;
-            justify-content: space-around;
-            padding: 15px 0;
-            background: #0d131f;
-            border-top: 1px solid var(--deep-blue);
-            z-index: 20;
-        }
-
-        .menu-item {
-            text-align: center;
+        /* Стили для Лидерборда и Бонуса */
+        .leaderboard-item {
+            display: flex; justify-content: space-between; padding: 12px; border-bottom: 1px solid #223;
             font-size: 14px;
-            color: #556;
-            cursor: pointer;
-            font-weight: bold;
-            transition: 0.3s;
         }
-        
-        .menu-item.active {
-            color: var(--ice-blue);
-            text-shadow: 0 0 10px var(--ice-blue);
-        }
+        .leaderboard-item:nth-child(1) { color: #ffd700; font-weight: bold; }
+        .leaderboard-item:nth-child(2) { color: #c0c0c0; font-weight: bold; }
+        .leaderboard-item:nth-child(3) { color: #cd7f32; font-weight: bold; }
 
-        /* --- МОДАЛЬНОЕ ОКНО АПГРЕЙДОВ --- */
-        .modal {
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0, 0, 0, 0.9);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
+        .daily-bonus-btn {
+            padding: 20px 40px; font-size: 20px; font-weight: bold;
+            background: linear-gradient(180deg, #00ff88, #00aa55); color: #000;
+            border: none; border-radius: 15px; cursor: pointer;
+            box-shadow: 0 10px 0 #007733, 0 15px 20px rgba(0,0,0,0.5);
+            transition: 0.1s; margin-top: 20px;
         }
-
-        .modal-content {
-            background: #0a0f18;
-            border: 2px solid var(--ice-blue);
-            border-radius: 15px;
-            width: 85%;
-            max-width: 350px;
-            padding: 20px;
-            box-shadow: 0 0 30px rgba(0, 210, 255, 0.3);
-        }
-
-        .modal-title {
-            text-align: center;
-            color: var(--ice-blue);
-            margin-top: 0;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
-
-        .upgrade-item {
-            background: #131a26;
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 15px;
-            border-left: 4px solid var(--deep-blue);
-        }
-
-        .upgrade-title {
-            font-weight: bold;
-            margin-bottom: 5px;
-            font-size: 16px;
-        }
-
-        .upgrade-desc {
-            font-size: 12px;
-            color: #889;
-            margin-bottom: 10px;
-        }
-
-        .buy-upgrade-btn {
-            width: 100%;
-            padding: 10px;
-            background: var(--ice-blue);
-            color: #000;
-            border: none;
-            border-radius: 5px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-
-        .buy-upgrade-btn:hover {
-            background: #fff;
-            box-shadow: 0 0 15px var(--ice-blue);
-        }
-
-        .buy-upgrade-btn:disabled {
-            background: #334;
-            color: #667;
-            cursor: not-allowed;
-            box-shadow: none;
-        }
-
-        .close-modal {
-            display: block;
-            width: 100%;
-            padding: 10px;
-            background: transparent;
-            color: #889;
-            border: 1px solid #445;
-            border-radius: 5px;
-            margin-top: 10px;
-            cursor: pointer;
-        }
+        .daily-bonus-btn:active { transform: translateY(10px); box-shadow: 0 0 0 #007733; }
+        .daily-bonus-btn:disabled { background: #333; box-shadow: 0 10px 0 #111; color: #666; }
     </style>
 </head>
 <body>
 
-    <!-- Ледяные полоски с лампочками -->
+    <!-- Полоски по краям -->
     <div class="ice-edge left">
         <div class="bulb"></div><div class="bulb"></div><div class="bulb"></div><div class="bulb"></div><div class="bulb"></div>
         <div class="bulb"></div><div class="bulb"></div><div class="bulb"></div><div class="bulb"></div><div class="bulb"></div>
@@ -318,94 +182,148 @@
     </div>
 
     <!-- Энергия -->
-    <div class="top-bar">
+    <div class="header">
         <div class="energy-container">
             <div class="energy-bar" id="energyBar"></div>
             <div class="energy-text" id="energyText">1000 / 1000</div>
         </div>
     </div>
 
-    <!-- Звезды -->
-    <div class="score-container">
-        <div class="score-title">Звездный баланс</div>
-        <div class="score">
-            <!-- SVG-звезда внутри круга -->
+    <!-- Баланс -->
+    <div class="balance-container">
+        <div class="score-title">Твой Баланс</div>
+        <div class="score-display">
             <svg class="coin-star" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-                <!-- Круг монеты -->
                 <circle cx="50" cy="50" r="45" fill="#111" stroke="#ffcc00" stroke-width="4"/>
-                <!-- Звезда внутри -->
                 <polygon points="50,15 61,40 88,40 66,57 74,85 50,68 26,85 34,57 12,40 39,40" fill="#ffcc00"/>
             </svg>
             <span id="score">0</span>
         </div>
     </div>
 
-    <!-- Кнопка клика -->
-    <div class="click-area" id="clickArea">
-        <button class="click-btn" id="clickBtn">
-            ⭐
-        </button>
+    <!-- ЭКРАН 1: КЛИКЕР -->
+    <div class="screen active" id="screenClick">
+        <button class="click-btn" id="clickBtn">⭐</button>
+    </div>
+
+    <!-- ЭКРАН 2: АПГРЕЙДЫ -->
+    <div class="screen" id="screenUpgrades">
+        <div class="list-container">
+            <!-- Апгрейд клика -->
+            <div class="list-item">
+                <div class="item-info">
+                    <div class="item-title">Усиление клика (Ур. <span id="lvlClick">1</span>)</div>
+                    <div class="item-desc">+1 звезда за тап</div>
+                    <div class="item-price" id="priceClick">100 ⭐</div>
+                </div>
+                <button class="buy-btn" id="btnUpgradeClick">Купить</button>
+            </div>
+            <!-- Бот-фермер -->
+            <div class="list-item" style="border-left-color: #ffcc00;">
+                <div class="item-info">
+                    <div class="item-title">🤖 Бот-фермер</div>
+                    <div class="item-desc">+1 звезда в секунду пассивно</div>
+                    <div class="item-price">50 000 ⭐</div>
+                </div>
+                <button class="buy-btn" id="btnBuyBot" style="background: linear-gradient(180deg, #ffcc00, #cc9900); box-shadow: 0 4px 0 #885500; color: #000;">Купить</button>
+            </div>
+            <!-- Мега-бот (Карточка) -->
+            <div class="list-item" style="border-left-color: #ff0055;">
+                <div class="item-info">
+                    <div class="item-title">🔥 Мега-бот</div>
+                    <div class="item-desc">+5 звезд в секунду пассивно</div>
+                    <div class="item-price">250 000 ⭐</div>
+                </div>
+                <button class="buy-btn" id="btnBuyMegaBot" style="background: linear-gradient(180deg, #ff0055, #aa0033); box-shadow: 0 4px 0 #550011;">Купить</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ЭКРАН 3: БОНУС -->
+    <div class="screen" id="screenBonus">
+        <h2 style="color: var(--ice-blue); text-transform: uppercase;">Ежедневный Бонус</h2>
+        <p style="text-align: center; color: #889;">Заходи каждый день и получай 5000 звезд бесплатно!</p>
+        <button class="daily-bonus-btn" id="btnDailyBonus">Забрать 5000 ⭐</button>
+    </div>
+
+    <!-- ЭКРАН 4: ЛИДЕРБОРД -->
+    <div class="screen" id="screenLeaderboard">
+        <div class="list-container" style="padding-top: 20px;">
+            <h2 style="color: var(--ice-blue); text-align: center; margin-top: 0;">ТОП ИГРОКОВ</h2>
+            <div class="list-item" style="padding: 0; background: transparent; box-shadow: none; border: none;">
+                <div style="width: 100%;">
+                    <div class="leaderboard-item"><span>1. CryptoKing</span> <span>1 250 000</span></div>
+                    <div class="leaderboard-item"><span>2. StarLord</span> <span>980 500</span></div>
+                    <div class="leaderboard-item"><span>3. MaxLoikoFan</span> <span>750 200</span></div>
+                    <div class="leaderboard-item"><span>4. Ты (Скоро тут)</span> <span id="myLeaderScore">0</span></div>
+                    <div class="leaderboard-item"><span>5. NoobMaster</span> <span>12 000</span></div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Меню -->
     <div class="bottom-menu">
-        <div class="menu-item active" id="tabClick">Тапать</div>
-        <div class="menu-item" id="tabUpgrade">Апгрейды</div>
-        <div class="menu-item">Друзья</div>
-    </div>
-
-    <!-- Окно Апгрейдов -->
-    <div class="modal" id="upgradeModal">
-        <div class="modal-content">
-            <h2 class="modal-title">Магазин Апгрейдов</h2>
-            
-            <div class="upgrade-item">
-                <div class="upgrade-title">Усиление клика (Ур. <span id="lvlClick">1</span>)</div>
-                <div class="upgrade-desc">Дает +1 звезду за тап.</div>
-                <button class="buy-upgrade-btn" id="btnUpgradeClick">Улучшить (Цена: 100)</button>
-            </div>
-
-            <div class="upgrade-item" style="border-left-color: #ffcc00;">
-                <div class="upgrade-title">🤖 Бот-фермер</div>
-                <div class="upgrade-desc">Автоматически фармит 1 звезду в секунду. Работает в фоне!</div>
-                <button class="buy-upgrade-btn" id="btnBuyBot" style="background: #ffcc00;">Купить бота (50 000)</button>
-            </div>
-
-            <button class="close-modal" id="closeModal">Закрыть</button>
-        </div>
+        <div class="menu-item active" data-target="screenClick">Тапать</div>
+        <div class="menu-item" data-target="screenUpgrades">Апгрейды</div>
+        <div class="menu-item" data-target="screenBonus">Бонус</div>
+        <div class="menu-item" data-target="screenLeaderboard">Топ</div>
     </div>
 
     <script>
         // --- ДАННЫЕ ИГРЫ ---
-        let score = localStorage.getItem('starClickerScore') ? parseInt(localStorage.getItem('starClickerScore')) : 0;
+        let score = parseInt(localStorage.getItem('starScore')) || 0;
         let maxEnergy = 1000;
         let energy = maxEnergy;
         let clickPower = 1; 
-        let clickUpgradeCost = 100;
-        let clickLevel = 1;
-        let hasBot = localStorage.getItem('starClickerBot') === 'true';
+        let clickLevel = parseInt(localStorage.getItem('starLevel')) || 1;
+        let clickUpgradeCost = clickLevel * 100; // Динамическая цена
+        
+        let hasBot = localStorage.getItem('starBot') === 'true';
+        let hasMegaBot = localStorage.getItem('starMegaBot') === 'true';
+        
+        let lastBonusDate = localStorage.getItem('starBonusDate') || "";
 
-        // Элементы
+        // --- ЭЛЕМЕНТЫ ---
         const scoreEl = document.getElementById('score');
         const clickBtn = document.getElementById('clickBtn');
-        const clickArea = document.getElementById('clickArea');
         const energyBar = document.getElementById('energyBar');
         const energyText = document.getElementById('energyText');
         
-        // Модалка
-        const modal = document.getElementById('upgradeModal');
-        const tabClick = document.getElementById('tabClick');
-        const tabUpgrade = document.getElementById('tabUpgrade');
-        const closeModal = document.getElementById('closeModal');
-        const btnUpgradeClick = document.getElementById('btnUpgradeClick');
-        const btnBuyBot = document.getElementById('btnBuyBot');
-        const lvlClickEl = document.getElementById('lvlClick');
+        // Меню
+        const menuItems = document.querySelectorAll('.menu-item');
+        const screens = document.querySelectorAll('.screen');
 
-        // Инициализация
-        scoreEl.innerText = score;
-        lvlClickEl.innerText = clickLevel;
-        updateEnergy();
-        checkBotStatus();
+        // Кнопки покупок
+        const btnUpgradeClick = document.getElementById('btnUpgradeClick');
+        const priceClickEl = document.getElementById('priceClick');
+        const lvlClickEl = document.getElementById('lvlClick');
+        
+        const btnBuyBot = document.getElementById('btnBuyBot');
+        const btnBuyMegaBot = document.getElementById('btnBuyMegaBot');
+        
+        const btnDailyBonus = document.getElementById('btnDailyBonus');
+        const myLeaderScore = document.getElementById('myLeaderScore');
+
+        // --- ИНИЦИАЛИЗАЦИЯ ---
+        function init() {
+            updateUI();
+            updateEnergy();
+            checkBonusStatus();
+            if(hasBot) btnBuyBot.disabled = true, btnBuyBot.innerText = "Куплен";
+            if(hasMegaBot) btnBuyMegaBot.disabled = true, btnBuyMegaBot.innerText = "Куплен";
+
+            // Переключение вкладок
+            menuItems.forEach(item => {
+                item.addEventListener('click', () => {
+                    menuItems.forEach(i => i.classList.remove('active'));
+                    screens.forEach(s => s.classList.remove('active'));
+                    
+                    item.classList.add('active');
+                    document.getElementById(item.dataset.target).classList.add('active');
+                });
+            });
+        }
 
         // --- ЛОГИКА КЛИКА ---
         clickBtn.addEventListener('click', (e) => {
@@ -413,20 +331,24 @@
                 energy -= 10;
                 score += clickPower;
                 saveData();
-                scoreEl.innerText = score;
+                updateUI();
                 updateEnergy();
                 createFloatingText(e.clientX, e.clientY);
             } else {
                 clickBtn.style.borderColor = "#ff0000";
-                setTimeout(() => clickBtn.style.borderColor = "var(--ice-blue)", 500);
+                setTimeout(() => clickBtn.style.borderColor = "var(--ice-blue)", 300);
             }
         });
 
-        // --- БОТ (ПАССИВНЫЙ ФАРМ) ---
+        // --- ПАССИВНЫЙ ДОХОД (БОТЫ) ---
         setInterval(() => {
-            if (hasBot) {
-                score += 1;
-                scoreEl.innerText = score;
+            let passiveIncome = 0;
+            if (hasBot) passiveIncome += 1;
+            if (hasMegaBot) passiveIncome += 5;
+            
+            if (passiveIncome > 0) {
+                score += passiveIncome;
+                updateUI();
                 saveData();
             }
         }, 1000);
@@ -440,37 +362,15 @@
             }
         }, 1000);
 
-        // --- МАГАЗИН (МОДАЛКА) ---
-        tabUpgrade.addEventListener('click', () => {
-            modal.style.display = 'flex';
-            tabUpgrade.classList.add('active');
-            tabClick.classList.remove('active');
-            updateUpgradeButtons();
-        });
-
-        tabClick.addEventListener('click', () => {
-            modal.style.display = 'none';
-            tabClick.classList.add('active');
-            tabUpgrade.classList.remove('active');
-        });
-
-        closeModal.addEventListener('click', () => {
-            modal.style.display = 'none';
-            tabClick.classList.add('active');
-            tabUpgrade.classList.remove('active');
-        });
-
-        // --- ПОКУПКА УЛУЧШЕНИЙ ---
+        // --- ПОКУПКИ ---
         btnUpgradeClick.addEventListener('click', () => {
             if (score >= clickUpgradeCost) {
                 score -= clickUpgradeCost;
                 clickLevel++;
                 clickPower++;
-                clickUpgradeCost = Math.floor(clickUpgradeCost * 2.5); // Усложняем следующий апгрейд
-                
+                clickUpgradeCost = clickLevel * 100; // Усложняем
                 saveData();
                 updateUI();
-                updateUpgradeButtons();
             }
         });
 
@@ -478,41 +378,68 @@
             if (score >= 50000 && !hasBot) {
                 score -= 50000;
                 hasBot = true;
-                localStorage.setItem('starClickerBot', 'true');
+                localStorage.setItem('starBot', 'true');
                 saveData();
                 updateUI();
-                updateUpgradeButtons();
-                alert("🤖 Бот-фермер куплен! Теперь он крадет 1 звезду в секунду для тебя.");
+                btnBuyBot.disabled = true;
+                btnBuyBot.innerText = "Куплен";
             }
         });
 
-        // --- ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ---
+        btnBuyMegaBot.addEventListener('click', () => {
+            if (score >= 250000 && !hasMegaBot) {
+                score -= 250000;
+                hasMegaBot = true;
+                localStorage.setItem('starMegaBot', 'true');
+                saveData();
+                updateUI();
+                btnBuyMegaBot.disabled = true;
+                btnBuyMegaBot.innerText = "Куплен";
+            }
+        });
+
+        // --- ЕЖЕДНЕВНЫЙ БОНУС ---
+        function checkBonusStatus() {
+            const today = new Date().toDateString();
+            if (lastBonusDate === today) {
+                btnDailyBonus.disabled = true;
+                btnDailyBonus.innerText = "Приходи завтра!";
+            } else {
+                btnDailyBonus.disabled = false;
+                btnDailyBonus.innerText = "Забрать 5000 ⭐";
+            }
+        }
+
+        btnDailyBonus.addEventListener('click', () => {
+            const today = new Date().toDateString();
+            if (lastBonusDate !== today) {
+                score += 5000;
+                lastBonusDate = today;
+                localStorage.setItem('starBonusDate', today);
+                saveData();
+                updateUI();
+                checkBonusStatus();
+                alert("Бонус получен! +5000 ⭐");
+            }
+        });
+
+        // --- ВСПОМОГАТЕЛЬНЫЕ ---
         function saveData() {
-            localStorage.setItem('starClickerScore', score);
+            localStorage.setItem('starScore', score);
+            localStorage.setItem('starLevel', clickLevel);
         }
 
         function updateUI() {
-            scoreEl.innerText = score;
+            scoreEl.innerText = formatNumber(score);
+            myLeaderScore.innerText = formatNumber(score) + " ⭐";
+            
             lvlClickEl.innerText = clickLevel;
-            btnUpgradeClick.innerText = `Улучшить (Цена: ${clickUpgradeCost})`;
-            if (hasBot) {
-                btnBuyBot.innerText = "Бот уже куплен";
-                btnBuyBot.disabled = true;
-            }
-        }
-
-        function updateUpgradeButtons() {
+            priceClickEl.innerText = formatNumber(clickUpgradeCost) + " ⭐";
+            
+            // Блокировка кнопок, если не хватает денег
             btnUpgradeClick.disabled = score < clickUpgradeCost;
-            if (!hasBot) {
-                btnBuyBot.disabled = score < 50000;
-            }
-        }
-
-        function checkBotStatus() {
-            if (hasBot) {
-                btnBuyBot.innerText = "Бот уже куплен";
-                btnBuyBot.disabled = true;
-            }
+            if (!hasBot) btnBuyBot.disabled = score < 50000;
+            if (!hasMegaBot) btnBuyMegaBot.disabled = score < 250000;
         }
 
         function updateEnergy() {
@@ -531,6 +458,16 @@
             document.body.appendChild(text);
             setTimeout(() => text.remove(), 1000);
         }
+
+        // Форматирование больших чисел (1000 -> 1K, 1000000 -> 1M)
+        function formatNumber(num) {
+            if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
+            if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
+            return num;
+        }
+
+        // Запуск
+        init();
     </script>
 </body>
 </html>
