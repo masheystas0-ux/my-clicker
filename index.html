@@ -1,509 +1,116 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Мега Кликер</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-            background-image: url('bp.jpg.png'); 
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-            user-select: none;
-            overflow: hidden;
-            background-color: #222;
-        }
+import asyncio
+import random
+from aiogram import Bot, Dispatcher, types, F
+from aiogram.filters import Command
+from aiogram.utils.keyboard import InlineKeyboardBuilder
 
-        /* Верхний блок со счетчиком */
-        #header {
-            background: rgba(0, 0, 0, 0.8);
-            padding: 15px; 
-            padding-top: calc(15px + env(safe-area-inset-top, 40px)); 
-            text-align: center;
-            border-bottom: 2px solid #FFD700;
-            z-index: 10;
-        }
+BOT_TOKEN = "ВАШ_ТОКЕН_ОТ_BOTFATHER"
 
-        #score-container {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            color: #FFD700;
-            font-size: 32px;
-            font-weight: bold;
-        }
+bot = Bot(token=BOT_TOKEN)
+dp = Dispatcher()
 
-        /* Контентная часть */
-        #main-content {
-            flex: 1;
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
+# Простая база данных в памяти (для реального проекта лучше использовать SQLite или PostgreSQL)
+users_db = {}
 
-        .tab-content {
-            display: none;
-            width: 100%;
-            height: 100%;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-        }
+# Настройка кейса: (Название, Редкость, Шанс в %, Примерная цена)
+NFT_POOL = [
+    {"name": "🐸 Pepe Punk #104", "rarity": "Обычный", "chance": 60, "price": 50},
+    {"name": "💎 TON Crystal #88", "rarity": "Редкий", "chance": 25, "price": 150},
+    {"name": "👑 Durov's Cap #07", "rarity": "Эпический", "chance": 12, "price": 500},
+    {"name": "🚀 Golden Rocket #01", "rarity": "Легендарный", "chance": 3, "price": 2500},
+]
 
-        .tab-content.active {
-            display: flex;
-        }
+CASE_COST = 100  # Стоимость одной прокрутки
 
-        /* Вкладка Кликер */
-        #click-btn {
-            width: 140px;
-            height: 140px;
-            border-radius: 50%;
-            border: 4px solid #FFD700;
-            background: rgba(255, 215, 0, 0.2);
-            backdrop-filter: blur(5px);
-            color: #fff;
-            font-size: 22px;
-            font-weight: bold;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.6);
-            cursor: pointer;
-            transition: transform 0.1s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
-            margin-bottom: 30px;
-        }
-        #click-btn:active { transform: scale(0.9); }
 
-        /* Вкладка Магазин */
-        .upgrade-item {
-            background: rgba(0, 0, 0, 0.8);
-            padding: 15px;
-            margin-bottom: 15px;
-            border-radius: 15px;
-            border: 1px solid #FFD700;
-            color: #fff;
-            width: 80%;
-            max-width: 300px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            text-align: center;
-        }
+def get_user(user_id: int):
+    if user_id not in users_db:
+        # Выдаем 500 монет новичку для теста
+        users_db[user_id] = {"balance": 500, "inventory": []}
+    return users_db[user_id]
 
-        .upgrade-item button {
-            background: #4CAF50;
-            color: white;
-            border: none;
-            padding: 12px;
-            border-radius: 10px;
-            font-weight: bold;
-            font-size: 16px;
-        }
 
-        /* Вкладка Апгрейдер */
-        #upgrader-panel {
-            background: rgba(0, 0, 0, 0.85);
-            padding: 20px;
-            border-radius: 20px;
-            border: 2px solid #555;
-            text-align: center;
-            color: #fff;
-            width: 90%;
-            max-width: 320px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
+def main_menu():
+    builder = InlineKeyboardBuilder()
+    builder.button(text=f"🎰 Крутить кейс ({CASE_COST} ⭐️)", callback_data="spin_case")
+    builder.button(text="🎒 Мой инвентарь", callback_data="inventory")
+    builder.button(text="💰 Пополнить (тест +500)", callback_data="add_funds")
+    builder.adjust(1)
+    return builder.as_markup()
 
-        /* Шкала */
-        #progress-bar-container {
-            width: 100%;
-            height: 30px;
-            background: #ff4d4d; /* Красная зона (проигрыш) */
-            border-radius: 15px;
-            position: relative;
-            overflow: hidden;
-            margin: 20px 0;
-            border: 2px solid #222;
-        }
 
-        /* Зеленая зона (выигрыш) */
-        #win-zone {
-            position: absolute;
-            left: 0;
-            top: 0;
-            height: 100%;
-            background: #4CAF50;
-            width: 50%; /* Ширина зависит от шанса */
-            transition: width 0.3s;
-        }
+@dp.message(Command("start"))
+async def cmd_start(message: types.Message):
+    user = get_user(message.from_user.id)
+    await message.answer(
+        f"👋 Добро пожаловать в NFT-рулетку!\n"
+        f"Твой баланс: **{user['balance']} ⭐️**\n\n"
+        f"Испытай удачу и выбей редкий NFT:",
+        reply_markup=main_menu(),
+        parse_mode="Markdown"
+    )
 
-        /* Бегунок */
-        #slider {
-            position: absolute;
-            top: -5px;
-            left: 0%;
-            width: 6px;
-            height: 40px;
-            background: #fff;
-            box-shadow: 0 0 10px #fff;
-            transform: translateX(-50%);
-            transition: left 0.1s linear;
-        }
 
-        /* Настройки ставки */
-        .bet-controls {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            width: 100%;
-            margin-bottom: 15px;
-            background: #222;
-            padding: 10px;
-            border-radius: 10px;
-        }
+@dp.callback_query(F.data == "spin_case")
+async def process_spin(callback: types.CallbackQuery):
+    user = get_user(callback.from_user.id)
 
-        .bet-controls button {
-            background: #444;
-            color: #fff;
-            border: none;
-            width: 40px;
-            height: 40px;
-            border-radius: 10px;
-            font-size: 20px;
-            font-weight: bold;
-        }
+    if user["balance"] < CASE_COST:
+        await callback.answer("❌ Недостаточно средств на балансе!", show_alert=True)
+        return
 
-        .bet-input {
-            background: transparent;
-            color: #FFD700;
-            border: none;
-            font-size: 24px;
-            font-weight: bold;
-            text-align: center;
-            width: 100px;
-            outline: none;
-        }
+    # Списываем стоимость прокрутки
+    user["balance"] -= CASE_COST
 
-        /* Кнопки шансов */
-        .chance-buttons {
-            display: flex;
-            gap: 10px;
-            width: 100%;
-            margin-bottom: 20px;
-        }
+    # Выбираем случайный NFT с учетом весов (шансов)
+    weights = [item["chance"] for item in NFT_POOL]
+    won_nft = random.choices(NFT_POOL, weights=weights, k=1)[0]
 
-        .chance-btn {
-            flex: 1;
-            background: #333;
-            color: #fff;
-            border: 1px solid #555;
-            padding: 10px 0;
-            border-radius: 10px;
-            font-weight: bold;
-        }
-        .chance-btn.active {
-            background: #FFD700;
-            color: #000;
-            border-color: #FFD700;
-        }
+    # Добавляем в инвентарь
+    user["inventory"].append(won_nft)
 
-        #upgrade-action-btn {
-            width: 100%;
-            background: #2196F3;
-            color: white;
-            border: none;
-            padding: 15px;
-            border-radius: 15px;
-            font-size: 20px;
-            font-weight: bold;
-            box-shadow: 0 5px 15px rgba(33, 150, 243, 0.4);
-        }
-        #upgrade-action-btn:disabled {
-            background: #555;
-            box-shadow: none;
-        }
+    await callback.message.edit_text(
+        f"🎉 **Тебе выпал NFT!**\n\n"
+        f"🎁 Предмет: **{won_nft['name']}**\n"
+        f"✨ Редкость: {won_nft['rarity']}\n"
+        f"💎 Ценность: {won_nft['price']} ⭐️\n\n"
+        f"Остаток баланса: **{user['balance']} ⭐️**",
+        reply_markup=main_menu(),
+        parse_mode="Markdown"
+    )
+    await callback.answer()
 
-        /* Нижняя панель навигации */
-        #nav-bar {
-            display: flex;
-            background: rgba(0, 0, 0, 0.95);
-            border-top: 2px solid #333;
-            padding: 10px 0;
-            padding-bottom: max(10px, env(safe-area-inset-bottom)); 
-        }
 
-        .nav-btn {
-            flex: 1;
-            background: none;
-            border: none;
-            color: #888;
-            font-size: 12px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 5px;
-            transition: color 0.3s;
-        }
+@dp.callback_query(F.data == "inventory")
+async def show_inventory(callback: types.CallbackQuery):
+    user = get_user(callback.from_user.id)
+    inv = user["inventory"]
 
-        .nav-btn.active {
-            color: #FFD700;
-        }
+    if not inv:
+        text = "🎒 Твой инвентарь пока пуст. Крути кейс!"
+    else:
+        items_text = "\n".join([f"• {item['name']} ({item['rarity']}) — {item['price']} ⭐️" for item in inv])
+        text = f"🎒 **Твои NFT ({len(inv)} шт.):**\n\n{items_text}"
 
-        .nav-btn span {
-            font-size: 20px;
-        }
-    </style>
-</head>
-<body>
-    <div id="header">
-        <div id="score-container">
-            <span>🪙</span>
-            <div id="score">0</div>
-        </div>
-    </div>
+    await callback.message.edit_text(text, reply_markup=main_menu(), parse_mode="Markdown")
+    await callback.answer()
 
-    <div id="main-content">
-        <!-- Вкладка 1: Кликер -->
-        <div id="tab-clicker" class="tab-content active">
-            <button id="click-btn">+1 🪙</button>
-        </div>
 
-        <!-- Вкладка 2: Магазин -->
-        <div id="tab-shop" class="tab-content">
-            <div class="upgrade-item">
-                <span>Сила клика: <b id="click-power-lvl">1</b></span>
-                <button id="buy-click-power">Улучшить (+1 за клик) - <span id="click-power-price">10</span> 🪙</button>
-            </div>
-            <div class="upgrade-item">
-                <span>Автоклик: <b id="auto-click-lvl">0</b></span>
-                <button id="buy-auto-click">Купить (+1 🪙/сек) - <span id="auto-click-price">50</span> 🪙</button>
-            </div>
-        </div>
+@dp.callback_query(F.data == "add_funds")
+async def add_test_funds(callback: types.CallbackQuery):
+    user = get_user(callback.from_user.id)
+    user["balance"] += 500
+    await callback.answer("✅ Начислено 500 тестовых ⭐️!", show_alert=True)
+    await callback.message.edit_text(
+        f"Твой баланс пополнен!\nТекущий баланс: **{user['balance']} ⭐️**",
+        reply_markup=main_menu(),
+        parse_mode="Markdown"
+    )
 
-        <!-- Вкладка 3: Апгрейдер -->
-        <div id="tab-upgrader" class="tab-content">
-            <div id="upgrader-panel">
-                <h2>📈 Апгрейдер</h2>
-                <p style="font-size: 14px; color: #aaa; margin-top: 0;">Испытай удачу и умножь монеты!</p>
-                
-                <div id="progress-bar-container">
-                    <div id="win-zone"></div>
-                    <div id="slider"></div>
-                </div>
 
-                <div class="chance-buttons">
-                    <button class="chance-btn" onclick="setChance(10, 3)">10% (x3)</button>
-                    <button class="chance-btn active" onclick="setChance(50, 1.8)">50% (x1.8)</button>
-                    <button class="chance-btn" onclick="setChance(80, 1.1)">80% (x1.1)</button>
-                </div>
+async def main():
+    await dp.start_polling(bot)
 
-                <div class="bet-controls">
-                    <button onclick="changeBet(-10)">-</button>
-                    <input type="number" id="bet-amount" class="bet-input" value="10" readonly>
-                    <button onclick="changeBet(10)">+</button>
-                </div>
 
-                <button id="upgrade-action-btn" onclick="startUpgrade()">Крутить</button>
-                <p id="upgrader-result" style="height: 20px; font-weight: bold; margin-top: 15px;"></p>
-            </div>
-        </div>
-    </div>
-
-    <!-- Нижняя навигация -->
-    <div id="nav-bar">
-        <button class="nav-btn active" onclick="switchTab('clicker')">
-            <span>🏠</span> Кликер
-        </button>
-        <button class="nav-btn" onclick="switchTab('shop')">
-            <span>🛒</span> Магазин
-        </button>
-        <button class="nav-btn" onclick="switchTab('upgrader')">
-            <span>📈</span> Апгрейд
-        </button>
-    </div>
-
-    <script>
-        const tg = window.Telegram?.WebApp;
-        if (tg) {
-            tg.ready();
-            tg.expand();
-        }
-
-        // --- ЗАГРУЗКА ДАННЫХ ---
-        let coins = parseInt(localStorage.getItem('coins')) || 0;
-        let clickPower = parseInt(localStorage.getItem('clickPower')) || 1;
-        let autoClickLevel = parseInt(localStorage.getItem('autoClickLevel')) || 0;
-        
-        let savedClickPrice = localStorage.getItem('clickPowerPrice');
-        let clickPowerPrice = savedClickPrice !== null ? parseInt(savedClickPrice) : 10;
-        
-        let savedAutoPrice = localStorage.getItem('autoClickPrice');
-        let autoClickPrice = savedAutoPrice !== null ? parseInt(savedAutoPrice) : 50;
-
-        // --- ЭЛЕМЕНТЫ ---
-        const scoreElement = document.getElementById('score');
-        const clickBtn = document.getElementById('click-btn');
-        
-        const buyClickPowerBtn = document.getElementById('buy-click-power');
-        const buyAutoClickBtn = document.getElementById('buy-auto-click');
-        const clickPowerLvlEl = document.getElementById('click-power-lvl');
-        const autoClickLvlEl = document.getElementById('auto-click-lvl');
-        const clickPowerPriceEl = document.getElementById('click-power-price');
-        const autoClickPriceEl = document.getElementById('auto-click-price');
-
-        // Апгрейдер
-        const betInput = document.getElementById('bet-amount');
-        const slider = document.getElementById('slider');
-        const winZone = document.getElementById('win-zone');
-        const upgraderResult = document.getElementById('upgrader-result');
-        const upgradeActionBtn = document.getElementById('upgrade-action-btn');
-
-        let currentChance = 50;
-        let currentMultiplier = 1.8;
-        let isUpgrading = false;
-
-        // --- НАВИГАЦИЯ ---
-        window.switchTab = function(tabName) {
-            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
-            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
-            document.getElementById('tab-' + tabName).classList.add('active');
-            event.currentTarget.classList.add('active');
-            if (tg) tg.HapticFeedback.selectionChanged();
-        }
-
-        // --- ОБНОВЛЕНИЕ ИНТЕРФЕЙСА ---
-        function updateUI() {
-            scoreElement.textContent = Math.floor(coins);
-            clickBtn.textContent = `+${clickPower} 🪙`;
-            clickPowerLvlEl.textContent = clickPower;
-            autoClickLvlEl.textContent = autoClickLevel;
-            clickPowerPriceEl.textContent = clickPowerPrice;
-            autoClickPriceEl.textContent = autoClickPrice;
-        }
-
-        // --- СОХРАНЕНИЕ ---
-        function saveData() {
-            localStorage.setItem('coins', coins);
-            localStorage.setItem('clickPower', clickPower);
-            localStorage.setItem('autoClickLevel', autoClickLevel);
-            localStorage.setItem('clickPowerPrice', clickPowerPrice);
-            localStorage.setItem('autoClickPrice', autoClickPrice);
-        }
-
-        // --- КЛИКЕР ---
-        clickBtn.addEventListener('click', () => {
-            coins += clickPower;
-            updateUI();
-            saveData();
-            if (tg) tg.HapticFeedback.impactOccurred('light');
-        });
-
-        // --- МАГАЗИН ---
-        buyClickPowerBtn.addEventListener('click', () => {
-            if (coins >= clickPowerPrice) {
-                coins -= clickPowerPrice;
-                clickPower += 1;
-                clickPowerPrice = Math.floor(clickPowerPrice * 1.5);
-                updateUI();
-                saveData();
-                if (tg) tg.HapticFeedback.notificationOccurred('success');
-            } else {
-                if (tg) tg.HapticFeedback.notificationOccurred('error');
-            }
-        });
-
-        buyAutoClickBtn.addEventListener('click', () => {
-            if (coins >= autoClickPrice) {
-                coins -= autoClickPrice;
-                autoClickLevel += 1;
-                autoClickPrice = Math.floor(autoClickPrice * 2);
-                updateUI();
-                saveData();
-                if (tg) tg.HapticFeedback.notificationOccurred('success');
-            } else {
-                if (tg) tg.HapticFeedback.notificationOccurred('error');
-            }
-        });
-
-        // --- АВТОКЛИК ---
-        setInterval(() => {
-            if (autoClickLevel > 0) {
-                coins += autoClickLevel;
-                updateUI();
-                saveData();
-            }
-        }, 1000);
-
-        // --- ЛОГИКА АПГРЕЙДЕРА ---
-        window.setChance = function(chance, multiplier) {
-            if (isUpgrading) return;
-            currentChance = chance;
-            currentMultiplier = multiplier;
-            
-            // Меняем ширину зеленой зоны
-            winZone.style.width = chance + '%';
-            
-            // Визуал кнопок
-            document.querySelectorAll('.chance-btn').forEach(btn => btn.classList.remove('active'));
-            event.currentTarget.classList.add('active');
-        }
-
-        window.changeBet = function(amount) {
-            if (isUpgrading) return;
-            let currentBet = parseInt(betInput.value) || 0;
-            let newBet = currentBet + amount;
-            if (newBet < 10) newBet = 10; // Минимальная ставка
-            betInput.value = newBet;
-        }
-
-        window.startUpgrade = function() {
-            if (isUpgrading) return;
-            
-            let bet = parseInt(betInput.value) || 0;
-            if (coins < bet) {
-                upgraderResult.textContent = "Недостаточно монет!";
-                upgraderResult.style.color = "#ff4d4d";
-                if (tg) tg.HapticFeedback.notificationOccurred('error');
-                return;
-            }
-
-            // Списываем ставку
-            coins -= bet;
-            updateUI();
-            saveData();
-
-            isUpgrading = true;
-            upgradeActionBtn.disabled = true;
-            upgraderResult.textContent = "";
-            slider.style.transition = "none"; // Убираем плавность для анимации
-            slider.style.left = "0%";
-
-            let currentPos = 0;
-            let speed = 5; // Скорость бегунка
-
-            // Анимация бегунка
-            const animateSlider = setInterval(() => {
-                currentPos += speed;
-                if (currentPos >= 100) {
-                    currentPos = 100;
-                    clearInterval(animateSlider);
-                    finishUpgrade(currentPos, bet);
-                }
-                slider.style.left = currentPos + '%';
-                if (tg) tg.HapticFeedback.selectionChanged(); // Легкая вибрация при движении
-            }, 20); // Чем меньше,
+if __name__ == "__main__":
+    asyncio.run(main())
