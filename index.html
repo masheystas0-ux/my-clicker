@@ -3,260 +3,211 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Мини-Игра: Кейсы</title>
+    <title>Off-White x Max Loiko</title>
     <style>
-        /* Базовые стили, чтобы было похоже на мобильное приложение */
+        /* Базовые стили */
         body {
-            background-color: #1a1a24;
+            background-color: #121212; /* Темный фон, как на твоих скринах */
             color: white;
-            font-family: Arial, sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin: 0;
-            padding: 20px;
-        }
-
-        .header {
-            width: 100%;
-            max-width: 400px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: #2a2a35;
-            padding: 15px;
-            border-radius: 15px;
-            margin-bottom: 20px;
-            box-sizing: border-box;
-        }
-
-        .balance {
-            color: #00ff00;
-            font-weight: bold;
-            font-size: 20px;
-        }
-
-        .btn {
-            background: #5a4bff;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 20px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-
-        .btn:hover {
-            background: #7a6bff;
-        }
-
-        /* Контейнер для рулетки */
-        .roulette-container {
-            width: 100%;
-            max-width: 400px;
-            height: 120px;
-            background: #2a2a35;
-            border-radius: 15px;
-            overflow: hidden;
-            position: relative;
-            margin-bottom: 20px;
-            border: 2px solid #5a4bff;
-            display: flex;
-            align-items: center;
-        }
-
-        /* Сама лента с предметами */
-        .roulette-strip {
-            display: flex;
-            transition: transform 3s cubic-bezier(0.1, 1, 0.1, 1); /* Плавная остановка */
-        }
-
-        /* Один предмет в рулетке */
-        .item {
-            width: 100px;
-            height: 100px;
-            margin: 0 5px;
-            background: #3a3a45;
-            border-radius: 10px;
+            font-family: 'Arial', sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 30px;
-            flex-shrink: 0;
+            height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
         }
 
-        /* Указатель посередине */
-        .pointer {
-            position: absolute;
-            top: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 4px;
-            height: 100%;
-            background: red;
-            z-index: 10;
-            box-shadow: 0 0 10px red;
-        }
-
-        /* Кнопки действий */
-        .actions {
-            display: flex;
-            gap: 15px;
+        /* Карточка товара */
+        .product-card {
+            background-color: #1e1e1e;
+            border-radius: 20px;
             width: 100%;
-            max-width: 400px;
+            max-width: 350px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            border: 1px solid #333;
+            transition: transform 0.3s ease;
         }
 
-        .action-btn {
-            flex: 1;
+        .product-card:hover {
+            transform: translateY(-5px);
+        }
+
+        /* Блок с фото */
+        .image-container {
+            position: relative;
+            width: 100%;
+            height: 350px;
+            background-color: #2a2a2a; /* Заглушка, если фото не загрузится */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .image-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .product-card:hover .image-container img {
+            transform: scale(1.05); /* Легкий зум при наведении */
+        }
+
+        /* Бейдж "Хит" */
+        .badge {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background-color: #ff0055;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            letter-spacing: 1px;
+            z-index: 10;
+        }
+
+        /* Информация о товаре */
+        .product-info {
+            padding: 20px;
+        }
+
+        .brand {
+            font-size: 12px;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+        }
+
+        .title {
+            font-size: 22px;
+            font-weight: 900;
+            margin: 0 0 10px 0;
+            text-transform: uppercase;
+            font-style: italic; /* В стиле Off-White */
+        }
+
+        .price {
+            font-size: 24px;
+            font-weight: bold;
+            color: #00ff88;
+            margin-bottom: 20px;
+        }
+
+        /* Выбор размера */
+        .sizes {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .size-btn {
+            background: transparent;
+            border: 1px solid #555;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 8px;
+           бира cursor: pointer;
+            font-weight: bold;
+            transition: all 0.2емs;
+        }
+
+        .size-btn:hover {
+            border-color: класс #00ff88;
+        }
+
+        .size-btn.active {
+            background: white;
+            color: black;
+            border-color: white;
+        }
+
+        /* Кнопка заказа */
+        .buy-btn {
+            width: 100%;
             padding: 15px;
-            border-radius: 10px;
+            background: white;
+            color: black;
             border: none;
+            border-radius: 10px;
             font-size: 16px;
             font-weight: bold;
+            text-transform: uppercase;
             cursor: pointer;
-            color: white;
+            transition: background 0.3s;
         }
 
-        .spin-btn { background: #ff8c00; }
-        .upgrade-btn { background: #ff0055; }
+        .buy-btn:hover {
+            background: #ddd;
+        }
 
-        .result-text {
-            margin-top: 20px;
-            font-size: 18px;
-            font-weight: bold;
-            color: #ffd700;
+        .buy-btn:active {
+            transform: scale(0.98);
         }
     </style>
 </head>
 <body>
 
-    <!-- Шапка с балансом -->
-    <div class="header">
-        <div>Баланс:</div>
-        <div class="balance" id="balance">1000 🪙</div>
-        <button class="btn" onclick="addCoins()">+100 🪙</button>
-    </div>
+    <div class="product-card">
+        <div class="image-container">
+            <!-- Замени ссылку ниже на свое фото -->
+            <img src="https://images.unsplash.com/photo-1556821840-3a63f95609a7?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Off-White Hoodie">
+            <div class="badge">🔥 ХИТ</div>
+        </div>
+        
+        <div class="product-info">
+            <div class="brand">Off-White ™</div>
+            <h1 class="title">Max Loiko Edition</h1>
+            <div class="price">150 BYN</div>
 
-    <!-- Рулетка -->
-    <div class="roulette-container">
-        <div class="pointer"></div>
-        <div class="roulette-strip" id="strip">
-            <!-- Сюда JS будет добавлять предметы -->
+            <div class="sizes">
+                <button class="size-btn" onclick="selectSize(this)">S</button>
+                <button class="size-btn active" onclick="selectSize(this)">M</button>
+                <button class="size-btn" onclick="selectSize(this)">L</button>
+                <button class="size-btn" onclick="selectSize(this)">XL</button>
+            </div>
+
+            <button class="buy-btn" onclick="orderItem()">Заказать</button>
         </div>
     </div>
 
-    <!-- Кнопки -->
-    <div class="actions">
-        <button class="action-btn upgrade-btn" onclick="spin(500, 2, 'Апгрейд')">Апгрейд (x2)</button>
-        <button class="action-btn spin-btn" onclick="spin(100, 1, 'Шторм')">Шторм</button>
-    </div>
-
-    <div class="result-text" id="result">Крути рулетку!</div>
-
     <script>
-        let balance = 1000;
-        const strip = document.getElementById('strip');
-        const balanceEl = document.getElementById('balance');
-        const resultEl = document.getElementById('result');
+        let selectedSize = 'M'; // Размер по умолчанию
 
-        // Возможные выигрыши в рулетке (эмодзи для простоты)
-        const items = ['💎', '🔫', '🍕', '👑', '🐸', '⭐', '💣'];
-        let currentPosition = 0;
-
-        // Функция для добавления монет (имитация "заработка" в игре)
-        function addCoins() {
-            balance += 100;
-            updateBalance();
+        // Функция выбора размера
+        function selectSize(button) {
+            // У 'active' у всех кнопок
+            document.querySelectorAll('.size-btn').forEach(btn => btn.classList.remove('active'));
+            // Добавляем класс 'active' нажатой кнопке
+            button.classList.add('active');
+            // Запоминаем выбранный размер
+            selectedSize = button.innerText;
         }
 
-        function updateBalance() {
-            balanceEl.innerText = balance + ' 🪙';
+        // Функция заказа (переход в Telegram)
+        function orderItem() {
+            // ВСТАВЬ СЮДА СВОЙ НИКНЕЙМ В ТЕЛЕГРАМЕ (без @)
+            const telegramUsername = 'твой_ник_в_тг'; 
+            
+            // Формируем текст сообщения
+            const message = `Привет! Хочу заказать Off-White Max Loiko. Размер: ${selectedSize}. Цена: 150 BYN.`;
+            
+            // Кодируем текст для ссылки
+            const encodedMessage = encodeURIComponent(message);
+            
+            // Ссылка на Telegram (откроется приложение, если установлено)
+            const telegramUrl = `https://t.me/${telegramUsername}?text=${encodedMessage}`;
+            
+            // Открываем ссылку
+            window.open(telegramUrl, '_blank');
         }
-
-        // Функция генерации ленты для визуала
-        function generateStrip() {
-            strip.innerHTML = '';
-            // Генерируем 50 предметов для длинной ленты
-            for (let i = 0; i < 50; i++) {
-                const randomItem = items[Math.floor(Math.random() * items.length)];
-                const div = document.createElement('div');
-                div.className = 'item';
-                div.innerText = randomItem;
-                strip.appendChild(div);
-            }
-        }
-
-        // Основная логика кручения
-        function spin(cost, multiplier, gameName) {
-            if (balance < cost) {
-                resultEl.innerText = "Недостаточно монет!";
-                resultEl.style.color = "#ff4444";
-                return;
-            }
-
-            balance -= cost;
-            updateBalance();
-            resultEl.innerText = "Крутим...";
-            resultEl.style.color = "white";
-
-            // 1. Сбрасываем позицию (чтобы анимация сработала заново)
-            strip.style.transition = 'none';
-            strip.style.transform = 'translateX(0px)';
-            currentPosition = 0;
-
-            // Генерируем новую ленту
-            generateStrip();
-
-            // 2. Ждем малую долю секунды, чтобы браузер применил сброс
-            setTimeout(() => {
-                strip.style.transition = 'transform 4s cubic-bezier(0.1, 1, 0.1, 1)'; // Возвращаем анимацию
-
-                // Выбираем случайный индекс для остановки (от 20 до 30)
-                // Нам нужно остановиться так, чтобы элемент был ровно под указателем
-                const stopIndex = Math.floor(Math.random() * 10) + 20; 
-                
-                // Расчет смещения: 1 элемент = 110px (100 ширина + 10 отступы)
-                // Центр экрана - это половина контейнера.
-                // Чтобы предмет встал под указатель, нам нужно прокрутить ленту.
-                const itemWidth = 110;
-                const containerWidth = document.querySelector('.roulette-container').offsetWidth;
-                const centerOffset = (containerWidth / 2) - (itemWidth / 2); // Смещение для центровки первого элемента
-                
-                // Итоговое смещение: (индекс * ширина) - центровка + случайный разброс внутри предмета
-                const randomOffsetInItem = (Math.random() * 60) - 30; // От -30 до +30 px
-                const translateX = -((stopIndex * itemWidth) - centerOffset + randomOffsetInItem);
-
-                strip.style.transform = `translateX(${translateX}px)`;
-
-                // 3. Выдаем результат после окончания анимации
-                setTimeout(() => {
-                    // Логика выигрыша (простая математика для примера)
-                    // Если "Апгрейд", шанс 40% на удвоение
-                    let isWin = false;
-                    if (gameName === 'Апгрейд') {
-                        isWin = Math.random() < 0.4; // 40% шанс
-                    } else {
-                        isWin = Math.random() < 0.6; // 60% шанс для Шторма
-                    }
-
-                    if (isWin) {
-                        const winAmount = cost * multiplier;
-                        balance += winAmount;
-                        resultEl.innerText = `Победа! Вы выиграли ${winAmount} 🪙`;
-                        resultEl.style.color = "#00ff00";
-                    } else {
-                        resultEl.innerText = `Проигрыш... Вы потеряли ${cost} 🪙`;
-                        resultEl.style.color = "#ff4444";
-                    }
-                    updateBalance();
-                }, 4000); // 4000 мс = время анимации (4s)
-
-            }, 50);
-        }
-
-        // Инициализация при загрузке
-        generateStrip();
     </script>
 </body>
 </html>
