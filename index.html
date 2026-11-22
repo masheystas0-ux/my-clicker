@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Мой Кликер</title>
+    <title>Монетка Кликер</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         body {
@@ -19,30 +19,37 @@
             background-repeat: no-repeat;
             font-family: -apple-system, BlinkMacSystemFont, sans-serif;
             user-select: none;
-            padding-bottom: 40px;
+            padding-bottom: 20px;
             box-sizing: border-box;
+            overflow: hidden;
         }
 
+        /* Верхний блок со счетчиком монет */
         #score-container {
-            background: rgba(0, 0, 0, 0.7);
-            padding: 10px 40px;
+            position: absolute;
+            top: 40px;
+            background: rgba(0, 0, 0, 0.75);
+            padding: 10px 30px;
             border-radius: 20px;
-            margin-bottom: 20px;
-            border: 2px solid #fff;
+            border: 2px solid #FFD700; /* Золотая рамка */
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
         #score {
             font-size: 42px;
             font-weight: bold;
-            color: #fff;
+            color: #FFD700; /* Золотой цвет текста */
         }
 
+        /* Кнопка клика */
         #click-btn {
             width: 150px;
             height: 150px;
             border-radius: 50%;
-            border: 4px solid #fff;
-            background: rgba(255, 255, 255, 0.2);
+            border: 4px solid #FFD700;
+            background: rgba(255, 215, 0, 0.3);
             backdrop-filter: blur(5px);
             color: #fff;
             font-size: 24px;
@@ -54,19 +61,108 @@
             align-items: center;
             justify-content: center;
             text-shadow: 1px 1px 3px rgba(0,0,0,0.8);
+            margin-bottom: 20px;
         }
         
         #click-btn:active {
             transform: scale(0.95);
         }
+
+        /* Кнопка открытия магазина */
+        #shop-btn {
+            background: #fff;
+            color: #333;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 15px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        /* Само окно магазина (скрыто по умолчанию) */
+        #shop-modal {
+            display: none;
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+        }
+
+        #shop-content {
+            background: #fff;
+            padding: 20px;
+            border-radius: 20px;
+            width: 80%;
+            max-width: 300px;
+            text-align: center;
+        }
+
+        .upgrade-item {
+            background: #f0f0f0;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .upgrade-item button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 8px;
+            font-weight: bold;
+        }
+
+        #close-shop {
+            margin-top: 10px;
+            background: #ff4d4d;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
+    <!-- Счетчик -->
     <div id="score-container">
+        <span style="font-size: 30px;">🪙</span>
         <div id="score">0</div>
     </div>
     
-    <button id="click-btn">КЛИК</button>
+    <!-- Кнопка клика -->
+    <button id="click-btn">+1 🪙</button>
+    
+    <!-- Кнопка магазина -->
+    <button id="shop-btn">🛒 Магазин</button>
+
+    <!-- Окно магазина -->
+    <div id="shop-modal">
+        <div id="shop-content">
+            <h2>Магазин</h2>
+            
+            <div class="upgrade-item">
+                <span>Сила клика: <span id="click-power-lvl">1</span></span>
+                <button id="buy-click-power">Улучшить (+1 за клик) - <span id="click-power-price">10</span> 🪙</button>
+            </div>
+
+            <div class="upgrade-item">
+                <span>Автоклик: <span id="auto-click-lvl">0</span></span>
+                <button id="buy-auto-click">Купить (+1 🪙/сек) - <span id="auto-click-price">50</span> 🪙</button>
+            </div>
+
+            <button id="close-shop">Закрыть</button>
+        </div>
+    </div>
 
     <script>
         const tg = window.Telegram?.WebApp;
@@ -75,25 +171,103 @@
             tg.expand();
         }
 
-        const scoreElement = document.getElementById('score');
-        const button = document.getElementById('click-btn');
+        // --- ЗАГРУЗКА ДАННЫХ ---
+        let coins = parseInt(localStorage.getItem('coins')) || 0;
+        let clickPower = parseInt(localStorage.getItem('clickPower')) || 1;
+        let autoClickLevel = parseInt(localStorage.getItem('autoClickLevel')) || 0;
         
-        // 1. Загружаем сохраненный счетчик из памяти устройства
-        let score = parseInt(localStorage.getItem('myClickerScore')) || 0;
-        scoreElement.textContent = score;
+        // Цены
+        let clickPowerPrice = 10;
+        let autoClickPrice = 50;
 
-        // 2. Обработчик клика
-        button.addEventListener('click', () => {
-            score++;
-            scoreElement.textContent = score;
+        // --- ЭЛЕМЕНТЫ ---
+        const scoreElement = document.getElementById('score');
+        const clickBtn = document.getElementById('click-btn');
+        const shopBtn = document.getElementById('shop-btn');
+        const shopModal = document.getElementById('shop-modal');
+        const closeShopBtn = document.getElementById('close-shop');
+        
+        const buyClickPowerBtn = document.getElementById('buy-click-power');
+        const buyAutoClickBtn = document.getElementById('buy-auto-click');
+        
+        const clickPowerLvlEl = document.getElementById('click-power-lvl');
+        const autoClickLvlEl = document.getElementById('auto-click-lvl');
+        const clickPowerPriceEl = document.getElementById('click-power-price');
+        const autoClickPriceEl = document.getElementById('auto-click-price');
+
+        // --- ФУНКЦИИ ОБНОВЛЕНИЯ ИНТЕРФЕЙСА ---
+        function updateUI() {
+            scoreElement.textContent = coins;
+            clickBtn.textContent = `+${clickPower} 🪙`;
+            clickPowerLvlEl.textContent = clickPower;
+            autoClickLvlEl.textContent = autoClickLevel;
             
-            // Сохраняем в память устройства
-            localStorage.setItem('myClickerScore', score);
-            
-            if (tg) {
-                tg.HapticFeedback.impactOccurred('light');
+            clickPowerPriceEl.textContent = clickPowerPrice;
+            autoClickPriceEl.textContent = autoClickPrice;
+        }
+
+        function saveData() {
+            localStorage.setItem('coins', coins);
+            localStorage.setItem('clickPower', clickPower);
+            localStorage.setItem('autoClickLevel', autoClickLevel);
+        }
+
+        // --- ЛОГИКА КЛИКА ---
+        clickBtn.addEventListener('click', () => {
+            coins += clickPower;
+            updateUI();
+            saveData();
+            if (tg) tg.HapticFeedback.impactOccurred('light');
+        });
+
+        // --- ЛОГИКА МАГАЗИНА ---
+        shopBtn.addEventListener('click', () => {
+            shopModal.style.display = 'flex';
+        });
+
+        closeShopBtn.addEventListener('click', () => {
+            shopModal.style.display = 'none';
+        });
+
+        // Покупка силы клика
+        buyClickPowerBtn.addEventListener('click', () => {
+            if (coins >= clickPowerPrice) {
+                coins -= clickPowerPrice;
+                clickPower += 1;
+                clickPowerPrice = Math.floor(clickPowerPrice * 1.5); // Цена растет
+                updateUI();
+                saveData();
+                if (tg) tg.HapticFeedback.notificationOccurred('success');
+            } else {
+                if (tg) tg.HapticFeedback.notificationOccurred('error');
             }
         });
+
+        // Покупка автоклика
+        buyAutoClickBtn.addEventListener('click', () => {
+            if (coins >= autoClickPrice) {
+                coins -= autoClickPrice;
+                autoClickLevel += 1;
+                autoClickPrice = Math.floor(autoClickPrice * 2); // Цена растет
+                updateUI();
+                saveData();
+                if (tg) tg.HapticFeedback.notificationOccurred('success');
+            } else {
+                if (tg) tg.HapticFeedback.notificationOccurred('error');
+            }
+        });
+
+        // --- АВТОКЛИК (каждую секунду) ---
+        setInterval(() => {
+            if (autoClickLevel > 0) {
+                coins += autoClickLevel;
+                updateUI();
+                saveData();
+            }
+        }, 1000);
+
+        // Инициализация при запуске
+        updateUI();
     </script>
 </body>
 </html>
