@@ -2,427 +2,261 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Мега Кликер</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Мини-Игра: Кейсы</title>
     <style>
+        /* Базовые стили, чтобы было похоже на мобильное приложение */
         body {
+            background-color: #1a1a24;
+            color: white;
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
             margin: 0;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-            background-image: url('bp.jpg.png'); 
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-            user-select: none;
-            overflow: hidden;
-            background-color: #222;
-        }
-
-        /* Верхний блок со счетчиком */
-        #header {
-            background: rgba(0, 0, 0, 0.8);
-            padding: 15px; 
-            padding-top: calc(15px + env(safe-area-inset-top, 40px)); 
-            text-align: center;
-            border-bottom: 2px solid #FFD700;
-            z-index: 10;
-        }
-
-        #score-container {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            color: #FFD700;
-            font-size: 32px;
-            font-weight: bold;
-        }
-
-        /* Контентная часть */
-        #main-content {
-            flex: 1;
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
             padding: 20px;
         }
 
-        .tab-content {
-            display: none;
+        .header {
             width: 100%;
-            height: 100%;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .tab-content.active {
-            display: flex;
-        }
-
-        /* Вкладка Кликер */
-        #click-btn {
-            width: 140px;
-            height: 140px;
-            border-radius: 50%;
-            border: 4px solid #FFD700;
-            background: rgba(255, 215, 0, 0.2);
-            backdrop-filter: blur(5px);
-            color: #fff;
-            font-size: 22px;
-            font-weight: bold;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.6);
-            cursor: pointer;
-            transition: transform 0.1s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
-            margin-bottom: 30px;
-        }
-        #click-btn:active { transform: scale(0.9); }
-
-        /* Вкладка Магазин */
-        .upgrade-item {
-            background: rgba(0, 0, 0, 0.8);
-            padding: 15px;
-            margin-bottom: 15px;
-            border-radius: 15px;
-            border: 1px solid #FFD700;
-            color: #fff;
-            width: 80%;
-            max-width: 300px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            text-align: center;
-        }
-
-        .upgrade-item button {
-            background: #4CAF50;
-            color: white;
-            border: none;
-            padding: 12px;
-            border-radius: 10px;
-            font-weight: bold;
-            font-size: 16px;
-        }
-
-        /* Вкладка Казино */
-        #slot-machine {
-            background: rgba(0, 0, 0, 0.85);
-            padding: 15px;
-            border-radius: 20px;
-            border: 3px solid #FFD700;
-            text-align: center;
-            color: #fff;
-            width: 90%;
-            max-width: 320px;
-        }
-
-        #slots {
+            max-width: 400px;
             display: flex;
             justify-content: space-between;
-            background: #fff;
-            padding: 10px;
-            border-radius: 15px;
-            margin: 15px 0;
-            font-size: 40px;
-        }
-
-        .slot {
-            width: 70px;
-            height: 70px;
-            display: flex;
             align-items: center;
-            justify-content: center;
-            background: #f0f0f0;
-            border-radius: 10px;
-            border: 2px solid #ccc;
+            background: #2a2a35;
+            padding: 15px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-sizing: border-box;
         }
 
-        .casino-controls {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
+        .balance {
+            color: #00ff00;
+            font-weight: bold;
+            font-size: 20px;
         }
 
-        .casino-controls button {
-            background: #ff4d4d;
+        .btn {
+            background: #5a4bff;
             color: white;
             border: none;
-            padding: 12px;
-            border-radius: 10px;
+            padding: 10px 20px;
+            border-radius: 20px;
             font-weight: bold;
-            font-size: 16px;
+            cursor: pointer;
+            transition: 0.3s;
         }
 
-        .casino-controls button:disabled {
-            background: #666;
+        .btn:hover {
+            background: #7a6bff;
         }
 
-        /* Нижняя панель навигации */
-        #nav-bar {
+        /* Контейнер для рулетки */
+        .roulette-container {
+            width: 100%;
+            max-width: 400px;
+            height: 120px;
+            background: #2a2a35;
+            border-radius: 15px;
+            overflow: hidden;
+            position: relative;
+            margin-bottom: 20px;
+            border: 2px solid #5a4bff;
             display: flex;
-            background: rgba(0, 0, 0, 0.95);
-            border-top: 2px solid #333;
-            padding: 10px 0;
-            padding-bottom: max(10px, env(safe-area-inset-bottom)); 
-        }
-
-        .nav-btn {
-            flex: 1;
-            background: none;
-            border: none;
-            color: #888;
-            font-size: 12px;
-            display: flex;
-            flex-direction: column;
             align-items: center;
-            gap: 5px;
-            transition: color 0.3s;
         }
 
-        .nav-btn.active {
-            color: #FFD700;
+        /* Сама лента с предметами */
+        .roulette-strip {
+            display: flex;
+            transition: transform 3s cubic-bezier(0.1, 1, 0.1, 1); /* Плавная остановка */
         }
 
-        .nav-btn span {
-            font-size: 20px;
+        /* Один предмет в рулетке */
+        .item {
+            width: 100px;
+            height: 100px;
+            margin: 0 5px;
+            background: #3a3a45;
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 30px;
+            flex-shrink: 0;
+        }
+
+        /* Указатель посередине */
+        .pointer {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 4px;
+            height: 100%;
+            background: red;
+            z-index: 10;
+            box-shadow: 0 0 10px red;
+        }
+
+        /* Кнопки действий */
+        .actions {
+            display: flex;
+            gap: 15px;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .action-btn {
+            flex: 1;
+            padding: 15px;
+            border-radius: 10px;
+            border: none;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            color: white;
+        }
+
+        .spin-btn { background: #ff8c00; }
+        .upgrade-btn { background: #ff0055; }
+
+        .result-text {
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+            color: #ffd700;
         }
     </style>
 </head>
 <body>
-    <div id="header">
-        <div id="score-container">
-            <span>🪙</span>
-            <div id="score">0</div>
+
+    <!-- Шапка с балансом -->
+    <div class="header">
+        <div>Баланс:</div>
+        <div class="balance" id="balance">1000 🪙</div>
+        <button class="btn" onclick="addCoins()">+100 🪙</button>
+    </div>
+
+    <!-- Рулетка -->
+    <div class="roulette-container">
+        <div class="pointer"></div>
+        <div class="roulette-strip" id="strip">
+            <!-- Сюда JS будет добавлять предметы -->
         </div>
     </div>
 
-    <div id="main-content">
-        <div id="tab-clicker" class="tab-content active">
-            <button id="click-btn">+1 🪙</button>
-        </div>
-
-        <div id="tab-shop" class="tab-content">
-            <div class="upgrade-item">
-                <span>Сила клика: <b id="click-power-lvl">1</b></span>
-                <button id="buy-click-power">Улучшить (+1 за клик) - <span id="click-power-price">10</span> 🪙</button>
-            </div>
-            <div class="upgrade-item">
-                <span>Автоклик: <b id="auto-click-lvl">0</b></span>
-                <button id="buy-auto-click">Купить (+1 🪙/сек) - <span id="auto-click-price">50</span> 🪙</button>
-            </div>
-        </div>
-
-        <div id="tab-casino" class="tab-content">
-            <div id="slot-machine">
-                <h2>🎰 Казино</h2>
-                <p>Ставка: <b>10 🪙</b></p>
-                <div id="slots">
-                    <div class="slot">🍒</div>
-                    <div class="slot">🍋</div>
-                    <div class="slot">💎</div>
-                </div>
-                <div class="casino-controls">
-                    <button id="spin-btn">Крутить (10 🪙)</button>
-                    <p id="casino-result" style="height: 20px; font-weight: bold; font-size: 14px;"></p>
-                </div>
-            </div>
-        </div>
+    <!-- Кнопки -->
+    <div class="actions">
+        <button class="action-btn upgrade-btn" onclick="spin(500, 2, 'Апгрейд')">Апгрейд (x2)</button>
+        <button class="action-btn spin-btn" onclick="spin(100, 1, 'Шторм')">Шторм</button>
     </div>
 
-    <div id="nav-bar">
-        <button class="nav-btn active" onclick="switchTab('clicker')">
-            <span>🏠</span> Кликер
-        </button>
-        <button class="nav-btn" onclick="switchTab('shop')">
-            <span>🛒</span> Магазин
-        </button>
-        <button class="nav-btn" onclick="switchTab('casino')">
-            <span>🎰</span> Казино
-        </button>
-    </div>
+    <div class="result-text" id="result">Крути рулетку!</div>
 
     <script>
-        const tg = window.Telegram?.WebApp;
-        if (tg) {
-            tg.ready();
-            tg.expand();
+        let balance = 1000;
+        const strip = document.getElementById('strip');
+        const balanceEl = document.getElementById('balance');
+        const resultEl = document.getElementById('result');
+
+        // Возможные выигрыши в рулетке (эмодзи для простоты)
+        const items = ['💎', '🔫', '🍕', '👑', '🐸', '⭐', '💣'];
+        let currentPosition = 0;
+
+        // Функция для добавления монет (имитация "заработка" в игре)
+        function addCoins() {
+            balance += 100;
+            updateBalance();
         }
 
-        // --- ЗАГРУЗКА ДАННЫХ ---
-        let coins = parseInt(localStorage.getItem('coins')) || 0;
-        let clickPower = parseInt(localStorage.getItem('clickPower')) || 1;
-        let autoClickLevel = parseInt(localStorage.getItem('autoClickLevel')) || 0;
-        
-        // ВОТ ГЛАВНОЕ ИСПРАВЛЕНИЕ:
-        // Если в памяти есть цена, берем её. Если нет (null), ставим 10.
-        let savedClickPrice = localStorage.getItem('clickPowerPrice');
-        let clickPowerPrice = savedClickPrice !== null ? parseInt(savedClickPrice) : 10;
-        
-        let savedAutoPrice = localStorage.getItem('autoClickPrice');
-        let autoClickPrice = savedAutoPrice !== null ? parseInt(savedAutoPrice) : 50;
-
-        // --- ЭЛЕМЕНТЫ ---
-        const scoreElement = document.getElementById('score');
-        const clickBtn = document.getElementById('click-btn');
-        
-        const buyClickPowerBtn = document.getElementById('buy-click-power');
-        const buyAutoClickBtn = document.getElementById('buy-auto-click');
-        const clickPowerLvlEl = document.getElementById('click-power-lvl');
-        const autoClickLvlEl = document.getElementById('auto-click-lvl');
-        const clickPowerPriceEl = document.getElementById('click-power-price');
-        const autoClickPriceEl = document.getElementById('auto-click-price');
-
-        const spinBtn = document.getElementById('spin-btn');
-        const slots = document.querySelectorAll('.slot');
-        const casinoResult = document.getElementById('casino-result');
-        const symbols = ['🍒', '🍋', '💎', '7️⃣', '🔔'];
-        let isSpinning = false;
-
-        // --- НАВИГАЦИЯ ---
-        window.switchTab = function(tabName) {
-            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
-            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
-            document.getElementById('tab-' + tabName).classList.add('active');
-            event.currentTarget.classList.add('active');
-            if (tg) tg.HapticFeedback.selectionChanged();
+        function updateBalance() {
+            balanceEl.innerText = balance + ' 🪙';
         }
 
-        // --- ОБНОВЛЕНИЕ ИНТЕРФЕЙСА ---
-        function updateUI() {
-            scoreElement.textContent = coins;
-            clickBtn.textContent = `+${clickPower} 🪙`;
-            clickPowerLvlEl.textContent = clickPower;
-            autoClickLvlEl.textContent = autoClickLevel;
-            clickPowerPriceEl.textContent = clickPowerPrice;
-            autoClickPriceEl.textContent = autoClickPrice;
-        }
-
-        // --- СОХРАНЕНИЕ ---
-        function saveData() {
-            localStorage.setItem('coins', coins);
-            localStorage.setItem('clickPower', clickPower);
-            localStorage.setItem('autoClickLevel', autoClickLevel);
-            localStorage.setItem('clickPowerPrice', clickPowerPrice);
-            localStorage.setItem('autoClickPrice', autoClickPrice);
-        }
-
-        // --- КЛИКЕР ---
-        clickBtn.addEventListener('click', () => {
-            coins += clickPower;
-            updateUI();
-            saveData();
-            if (tg) tg.HapticFeedback.impactOccurred('light');
-        });
-
-        // --- МАГАЗИН ---
-        buyClickPowerBtn.addEventListener('click', () => {
-            if (coins >= clickPowerPrice) {
-                coins -= clickPowerPrice;
-                clickPower += 1;
-                clickPowerPrice = Math.floor(clickPowerPrice * 1.5);
-                updateUI();
-                saveData();
-                if (tg) tg.HapticFeedback.notificationOccurred('success');
-            } else {
-                if (tg) tg.HapticFeedback.notificationOccurred('error');
+        // Функция генерации ленты для визуала
+        function generateStrip() {
+            strip.innerHTML = '';
+            // Генерируем 50 предметов для длинной ленты
+            for (let i = 0; i < 50; i++) {
+                const randomItem = items[Math.floor(Math.random() * items.length)];
+                const div = document.createElement('div');
+                div.className = 'item';
+                div.innerText = randomItem;
+                strip.appendChild(div);
             }
-        });
+        }
 
-        buyAutoClickBtn.addEventListener('click', () => {
-            if (coins >= autoClickPrice) {
-                coins -= autoClickPrice;
-                autoClickLevel += 1;
-                autoClickPrice = Math.floor(autoClickPrice * 2);
-                updateUI();
-                saveData();
-                if (tg) tg.HapticFeedback.notificationOccurred('success');
-            } else {
-                if (tg) tg.HapticFeedback.notificationOccurred('error');
-            }
-        });
-
-        // --- АВТОКЛИК ---
-        setInterval(() => {
-            if (autoClickLevel > 0) {
-                coins += autoClickLevel;
-                updateUI();
-                saveData();
-            }
-        }, 1000);
-
-        // --- КАЗИНО ---
-        spinBtn.addEventListener('click', () => {
-            if (isSpinning) return;
-            if (coins < 10) {
-                casinoResult.textContent = "Недостаточно монет!";
-                casinoResult.style.color = "#ff4d4d";
-                if (tg) tg.HapticFeedback.notificationOccurred('error');
+        // Основная логика кручения
+        function spin(cost, multiplier, gameName) {
+            if (balance < cost) {
+                resultEl.innerText = "Недостаточно монет!";
+                resultEl.style.color = "#ff4444";
                 return;
             }
 
-            coins -= 10;
-            updateUI();
-            saveData();
-            
-            isSpinning = true;
-            spinBtn.disabled = true;
-            spinBtn.textContent = "Крутим...";
-            casinoResult.textContent = "";
+            balance -= cost;
+            updateBalance();
+            resultEl.innerText = "Крутим...";
+            resultEl.style.color = "white";
 
-            let spins = 0;
-            const spinInterval = setInterval(() => {
-                slots.forEach(slot => {
-                    slot.textContent = symbols[Math.floor(Math.random() * symbols.length)];
-                });
-                spins++;
-                if (tg) tg.HapticFeedback.impactOccurred('light');
+            // 1. Сбрасываем позицию (чтобы анимация сработала заново)
+            strip.style.transition = 'none';
+            strip.style.transform = 'translateX(0px)';
+            currentPosition = 0;
 
-                if (spins > 15) {
-                    clearInterval(spinInterval);
-                    checkWin();
-                }
-            }, 100);
-        });
+            // Генерируем новую ленту
+            generateStrip();
 
-        function checkWin() {
-            const s1 = slots[0].textContent;
-            const s2 = slots[1].textContent;
-            const s3 = slots[2].textContent;
+            // 2. Ждем малую долю секунды, чтобы браузер применил сброс
+            setTimeout(() => {
+                strip.style.transition = 'transform 4s cubic-bezier(0.1, 1, 0.1, 1)'; // Возвращаем анимацию
 
-            if (s1 === s2 && s2 === s3) {
-                let winAmount = 0;
-                if (s1 === '7️⃣') winAmount = 500;
-                else if (s1 === '💎') winAmount = 200;
-                else winAmount = 50;
+                // Выбираем случайный индекс для остановки (от 20 до 30)
+                // Нам нужно остановиться так, чтобы элемент был ровно под указателем
+                const stopIndex = Math.floor(Math.random() * 10) + 20; 
+                
+                // Расчет смещения: 1 элемент = 110px (100 ширина + 10 отступы)
+                // Центр экрана - это половина контейнера.
+                // Чтобы предмет встал под указатель, нам нужно прокрутить ленту.
+                const itemWidth = 110;
+                const containerWidth = document.querySelector('.roulette-container').offsetWidth;
+                const centerOffset = (containerWidth / 2) - (itemWidth / 2); // Смещение для центровки первого элемента
+                
+                // Итоговое смещение: (индекс * ширина) - центровка + случайный разброс внутри предмета
+                const randomOffsetInItem = (Math.random() * 60) - 30; // От -30 до +30 px
+                const translateX = -((stopIndex * itemWidth) - centerOffset + randomOffsetInItem);
 
-                coins += winAmount;
-                casinoResult.textContent = `ДЖЕКПОТ! Выигрыш: ${winAmount} 🪙`;
-                casinoResult.style.color = "#4CAF50";
-                if (tg) tg.HapticFeedback.notificationOccurred('success');
-            } else {
-                casinoResult.textContent = "Повезет в следующий раз!";
-                casinoResult.style.color = "#ff4d4d";
-            }
+                strip.style.transform = `translateX(${translateX}px)`;
 
-            updateUI();
-            saveData();
-            isSpinning = false;
-            spinBtn.disabled = false;
-            spinBtn.textContent = "Крутить (10 🪙)";
+                // 3. Выдаем результат после окончания анимации
+                setTimeout(() => {
+                    // Логика выигрыша (простая математика для примера)
+                    // Если "Апгрейд", шанс 40% на удвоение
+                    let isWin = false;
+                    if (gameName === 'Апгрейд') {
+                        isWin = Math.random() < 0.4; // 40% шанс
+                    } else {
+                        isWin = Math.random() < 0.6; // 60% шанс для Шторма
+                    }
+
+                    if (isWin) {
+                        const winAmount = cost * multiplier;
+                        balance += winAmount;
+                        resultEl.innerText = `Победа! Вы выиграли ${winAmount} 🪙`;
+                        resultEl.style.color = "#00ff00";
+                    } else {
+                        resultEl.innerText = `Проигрыш... Вы потеряли ${cost} 🪙`;
+                        resultEl.style.color = "#ff4444";
+                    }
+                    updateBalance();
+                }, 4000); // 4000 мс = время анимации (4s)
+
+            }, 50);
         }
 
-        // Инициализация
-        updateUI();
+        // Инициализация при загрузке
+        generateStrip();
     </script>
 </body>
 </html>
