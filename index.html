@@ -3,533 +3,507 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Дурак: Damcrew Edition</title>
+    <title>Мега Кликер</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         body {
             margin: 0;
             padding: 0;
+            display: flex;
+            flex-direction: column;
             height: 100vh;
-            background: radial-gradient(circle, #2e7d32, #1b5e20); /* Зеленое сукно */
+            background-image: url('bp.jpg.png'); 
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
             font-family: -apple-system, BlinkMacSystemFont, sans-serif;
             user-select: none;
             overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            color: white;
+            background-color: #222;
         }
 
-        /* Верхняя панель */
-        #top-bar {
-            height: 60px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 20px;
-            background: rgba(0,0,0,0.4);
-            box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+        /* Верхний блок со счетчиком */
+        #header {
+            background: rgba(0, 0, 0, 0.8);
+            padding: 15px; 
+            padding-top: calc(15px + env(safe-area-inset-top, 40px)); 
+            text-align: center;
+            border-bottom: 2px solid #FFD700;
+            z-index: 10;
         }
 
-        .info-block {
+        #score-container {
             display: flex;
-            align-items: center;
-            gap: 10px;
-            font-weight: bold;
-        }
-
-        #balance { color: #FFD700; font-size: 18px; }
-        #trump-info { font-size: 18px; }
-
-        /* Карты */
-        .card {
-            width: 55px;
-            height: 85px;
-            background: #fff;
-            border-radius: 8px;
-            display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
-            font-size: 20px;
+            gap: 10px;
+            color: #FFD700;
+            font-size: 32px;
             font-weight: bold;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.5);
-            position: relative;
-            transition: all 0.3s ease;
-            border: 1px solid #ccc;
-        }
-        .card::before, .card::after {
-            content: attr(data-rank);
-            position: absolute;
-            font-size: 12px;
-        }
-        .card::before { top: 5px; left: 5px; }
-        .card::after { bottom: 5px; right: 5px; transform: rotate(180deg); }
-
-        .card.red { color: #d32f2f; }
-        .card.black { color: #111; }
-
-        /* Рубашка карты */
-        .card-back {
-            width: 55px;
-            height: 85px;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.5);
-            border: 2px solid #fff;
-            /* Узор рубашки */
-            background: 
-                linear-gradient(45deg, #b71c1c 25%, transparent 25%, transparent 75%, #b71c1c 75%, #b71c1c), 
-                linear-gradient(45deg, #b71c1c 25%, #880e4f 25%, #880e4f 75%, #b71c1c 75%, #b71c1c);
-            background-size: 10px 10px;
-            background-position: 0 0, 5px 5px;
         }
 
-        /* Игровые зоны */
-        #game-board {
+        /* Контентная часть */
+        #main-content {
             flex: 1;
             position: relative;
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
-            padding: 10px;
-        }
-
-        /* Рука бота */
-        #bot-hand {
-            display: flex;
+            align-items: center;
             justify-content: center;
-            height: 85px;
-            margin-top: 10px;
-        }
-        #bot-hand .card-back {
-            margin-left: -30px;
+            padding: 20px;
         }
 
-        /* Зона стола */
-        #table-zone {
-            flex: 1;
-            display: flex;
-            flex-wrap: wrap;
+        .tab-content {
+            display: none;
+            width: 100%;
+            height: 100%;
+            flex-direction: column;
+            align-items: center;
             justify-content: center;
-            align-content: center;
-            gap: 10px;
-            position: relative;
         }
 
-        .table-pair {
-            position: relative;
-            width: 55px;
-            height: 85px;
+        .tab-content.active {
+            display: flex;
         }
 
-        .table-card {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 55px;
-            height: 85px;
-            border-radius: 8px;
-            background: #fff;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.5);
+        /* Вкладка Кликер */
+        #click-btn {
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            border: 4px solid #FFD700;
+            background: rgba(255, 215, 0, 0.2);
+            backdrop-filter: blur(5px);
+            color: #fff;
+            font-size: 22px;
+            font-weight: bold;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+            cursor: pointer;
+            transition: transform 0.1s;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 20px;
-            font-weight: bold;
-            border: 1px solid #ccc;
-            transition: transform 0.3s ease;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+            margin-bottom: 30px;
         }
-        
-        .table-card.defend {
-            transform: translate(15px, 15px) rotate(15deg); /* Эффект битой карты */
-        }
+        #click-btn:active { transform: scale(0.9); }
 
-        /* Рука игрока */
-        #player-hand {
+        /* Вкладка Магазин */
+        .upgrade-item {
+            background: rgba(0, 0, 0, 0.8);
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 15px;
+            border: 1px solid #FFD700;
+            color: #fff;
+            width: 80%;
+            max-width: 300px;
             display: flex;
-            justify-content: center;
-            overflow-x: auto;
-            padding: 10px 0;
-            min-height: 100px;
-            gap: 5px;
-        }
-        #player-hand .card {
-            cursor: pointer;
-            margin-top: 15px;
-        }
-        #player-hand .card:hover {
-            transform: translateY(-15px);
+            flex-direction: column;
+            gap: 10px;
+            text-align: center;
         }
 
-        /* Кнопки */
-        #controls {
-            display: flex;
-            justify-content: space-around;
-            padding: 10px 20px;
-            padding-bottom: max(20px, env(safe-area-inset-bottom));
-            background: rgba(0,0,0,0.6);
-        }
-
-        button {
-            padding: 12px 20px;
-            border-radius: 10px;
-            border: none;
-            font-weight: bold;
-            font-size: 16px;
-            cursor: pointer;
+        .upgrade-item button {
             background: #4CAF50;
             color: white;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
-            transition: transform 0.1s;
+            border: none;
+            padding: 12px;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 16px;
         }
-        button:active { transform: scale(0.95); }
-        button:disabled { background: #555; color: #888; box-shadow: none; }
-        #btn-take { background: #f44336; }
 
-        /* Статус */
-        #status {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(0,0,0,0.9);
-            color: white;
+        /* Вкладка Апгрейдер */
+        #upgrader-panel {
+            background: rgba(0, 0, 0, 0.85);
             padding: 20px;
-            border-radius: 15px;
-            font-size: 22px;
-            display: none;
+            border-radius: 20px;
+            border: 2px solid #555;
             text-align: center;
-            border: 2px solid #FFD700;
-            z-index: 100;
+            color: #fff;
+            width: 90%;
+            max-width: 320px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
-        #status button {
-            margin-top: 15px;
+
+        /* Шкала */
+        #progress-bar-container {
+            width: 100%;
+            height: 30px;
+            background: #ff4d4d; /* Красная зона (проигрыш) */
+            border-radius: 15px;
+            position: relative;
+            overflow: hidden;
+            margin: 20px 0;
+            border: 2px solid #222;
+        }
+
+        /* Зеленая зона (выигрыш) */
+        #win-zone {
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            background: #4CAF50;
+            width: 50%; /* Ширина зависит от шанса */
+            transition: width 0.3s;
+        }
+
+        /* Бегунок */
+        #slider {
+            position: absolute;
+            top: -5px;
+            left: 0%;
+            width: 6px;
+            height: 40px;
+            background: #fff;
+            box-shadow: 0 0 10px #fff;
+            transform: translateX(-50%);
+            transition: left 0.1s linear;
+        }
+
+        /* Настройки ставки */
+        .bet-controls {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            margin-bottom: 15px;
+            background: #222;
+            padding: 10px;
+            border-radius: 10px;
+        }
+
+        .bet-controls button {
+            background: #444;
+            color: #fff;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .bet-input {
+            background: transparent;
+            color: #FFD700;
+            border: none;
+            font-size: 24px;
+            font-weight: bold;
+            text-align: center;
+            width: 100px;
+            outline: none;
+        }
+
+        /* Кнопки шансов */
+        .chance-buttons {
+            display: flex;
+            gap: 10px;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
+        .chance-btn {
+            flex: 1;
+            background: #333;
+            color: #fff;
+            border: 1px solid #555;
+            padding: 10px 0;
+            border-radius: 10px;
+            font-weight: bold;
+        }
+        .chance-btn.active {
             background: #FFD700;
-            color: black;
+            color: #000;
+            border-color: #FFD700;
+        }
+
+        #upgrade-action-btn {
+            width: 100%;
+            background: #2196F3;
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 15px;
+            font-size: 20px;
+            font-weight: bold;
+            box-shadow: 0 5px 15px rgba(33, 150, 243, 0.4);
+        }
+        #upgrade-action-btn:disabled {
+            background: #555;
+            box-shadow: none;
+        }
+
+        /* Нижняя панель навигации */
+        #nav-bar {
+            display: flex;
+            background: rgba(0, 0, 0, 0.95);
+            border-top: 2px solid #333;
+            padding: 10px 0;
+            padding-bottom: max(10px, env(safe-area-inset-bottom)); 
+        }
+
+        .nav-btn {
+            flex: 1;
+            background: none;
+            border: none;
+            color: #888;
+            font-size: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            transition: color 0.3s;
+        }
+
+        .nav-btn.active {
+            color: #FFD700;
+        }
+
+        .nav-btn span {
+            font-size: 20px;
         }
     </style>
 </head>
 <body>
-
-    <div id="top-bar">
-        <div class="info-block" id="deck-count">Колода: 0</div>
-        <div class="info-block" id="trump-info">Козырь: </div>
-        <div class="info-block" id="balance">🪙 500</div>
-    </div>
-
-    <div id="game-board">
-        <div id="bot-hand"></div>
-        <div id="table-zone"></div>
-        <div id="player-hand"></div>
-        <div id="status">
-            <div id="status-text"></div>
-            <button onclick="startGame()">Играть снова</button>
+    <div id="header">
+        <div id="score-container">
+            <span>🪙</span>
+            <div id="score">0</div>
         </div>
     </div>
 
-    <div id="controls">
-        <button id="btn-take" style="display: none;">Взять карты</button>
-        <button id="btn-pass" style="display: none;">Бито</button>
+    <div id="main-content">
+        <!-- Вкладка 1: Кликер -->
+        <div id="tab-clicker" class="tab-content active">
+            <button id="click-btn">+1 🪙</button>
+        </div>
+
+        <!-- Вкладка 2: Магазин -->
+        <div id="tab-shop" class="tab-content">
+            <div class="upgrade-item">
+                <span>Сила клика: <b id="click-power-lvl">1</b></span>
+                <button id="buy-click-power">Улучшить (+1 за клик) - <span id="click-power-price">10</span> 🪙</button>
+            </div>
+            <div class="upgrade-item">
+                <span>Автоклик: <b id="auto-click-lvl">0</b></span>
+                <button id="buy-auto-click">Купить (+1 🪙/сек) - <span id="auto-click-price">50</span> 🪙</button>
+            </div>
+        </div>
+
+        <!-- Вкладка 3: Апгрейдер -->
+        <div id="tab-upgrader" class="tab-content">
+            <div id="upgrader-panel">
+                <h2>📈 Апгрейдер</h2>
+                <p style="font-size: 14px; color: #aaa; margin-top: 0;">Испытай удачу и умножь монеты!</p>
+                
+                <div id="progress-bar-container">
+                    <div id="win-zone"></div>
+                    <div id="slider"></div>
+                </div>
+
+                <div class="chance-buttons">
+                    <button class="chance-btn" onclick="setChance(10, 3)">10% (x3)</button>
+                    <button class="chance-btn active" onclick="setChance(50, 1.8)">50% (x1.8)</button>
+                    <button class="chance-btn" onclick="setChance(80, 1.1)">80% (x1.1)</button>
+                </div>
+
+                <div class="bet-controls">
+                    <button onclick="changeBet(-10)">-</button>
+                    <input type="number" id="bet-amount" class="bet-input" value="10" readonly>
+                    <button onclick="changeBet(10)">+</button>
+                </div>
+
+                <button id="upgrade-action-btn" onclick="startUpgrade()">Крутить</button>
+                <p id="upgrader-result" style="height: 20px; font-weight: bold; margin-top: 15px;"></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Нижняя навигация -->
+    <div id="nav-bar">
+        <button class="nav-btn active" onclick="switchTab('clicker')">
+            <span>🏠</span> Кликер
+        </button>
+        <button class="nav-btn" onclick="switchTab('shop')">
+            <span>🛒</span> Магазин
+        </button>
+        <button class="nav-btn" onclick="switchTab('upgrader')">
+            <span>📈</span> Апгрейд
+        </button>
     </div>
 
     <script>
         const tg = window.Telegram?.WebApp;
-        if (tg) { tg.ready(); tg.expand(); }
+        if (tg) {
+            tg.ready();
+            tg.expand();
+        }
 
-        // --- Логика ---
-        const suits = ['♠', '♥', '♦', '♣'];
-        const ranks = ['6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'];
-        let deck = [];
-        let playerHand = [];
-        let botHand = [];
-        let table = []; 
-        let trumpSuit = '';
-        let turn = 'player';
-        let gameOver = false;
+        // --- ЗАГРУЗКА ДАННЫХ ---
+        let coins = parseInt(localStorage.getItem('coins')) || 0;
+        let clickPower = parseInt(localStorage.getItem('clickPower')) || 1;
+        let autoClickLevel = parseInt(localStorage.getItem('autoClickLevel')) || 0;
         
-        // Баланс
-        let balance = parseInt(localStorage.getItem('durak_balance')) || 500;
-        const betAmount = 50; // Ставка за игру
+        let savedClickPrice = localStorage.getItem('clickPowerPrice');
+        let clickPowerPrice = savedClickPrice !== null ? parseInt(savedClickPrice) : 10;
+        
+        let savedAutoPrice = localStorage.getItem('autoClickPrice');
+        let autoClickPrice = savedAutoPrice !== null ? parseInt(savedAutoPrice) : 50;
 
-        function createDeck() {
-            deck = [];
-            for (let suit of suits) {
-                for (let rank of ranks) {
-                    deck.push({ suit, rank, value: ranks.indexOf(rank) });
-                }
-            }
-            deck.sort(() => Math.random() - 0.5);
+        // --- ЭЛЕМЕНТЫ ---
+        const scoreElement = document.getElementById('score');
+        const clickBtn = document.getElementById('click-btn');
+        
+        const buyClickPowerBtn = document.getElementById('buy-click-power');
+        const buyAutoClickBtn = document.getElementById('buy-auto-click');
+        const clickPowerLvlEl = document.getElementById('click-power-lvl');
+        const autoClickLvlEl = document.getElementById('auto-click-lvl');
+        const clickPowerPriceEl = document.getElementById('click-power-price');
+        const autoClickPriceEl = document.getElementById('auto-click-price');
+
+        // Апгрейдер
+        const betInput = document.getElementById('bet-amount');
+        const slider = document.getElementById('slider');
+        const winZone = document.getElementById('win-zone');
+        const upgraderResult = document.getElementById('upgrader-result');
+        const upgradeActionBtn = document.getElementById('upgrade-action-btn');
+
+        let currentChance = 50;
+        let currentMultiplier = 1.8;
+        let isUpgrading = false;
+
+        // --- НАВИГАЦИЯ ---
+        window.switchTab = function(tabName) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('tab-' + tabName).classList.add('active');
+            event.currentTarget.classList.add('active');
+            if (tg) tg.HapticFeedback.selectionChanged();
         }
 
-        function dealCards() {
-            for (let i = 0; i < 6; i++) {
-                if (deck.length > 0) playerHand.push(deck.pop());
-                if (deck.length > 0) botHand.push(deck.pop());
-            }
-            playerHand.sort((a, b) => a.value - b.value);
-            botHand.sort((a, b) => a.value - b.value);
+        // --- ОБНОВЛЕНИЕ ИНТЕРФЕЙСА ---
+        function updateUI() {
+            scoreElement.textContent = Math.floor(coins);
+            clickBtn.textContent = `+${clickPower} 🪙`;
+            clickPowerLvlEl.textContent = clickPower;
+            autoClickLvlEl.textContent = autoClickLevel;
+            clickPowerPriceEl.textContent = clickPowerPrice;
+            autoClickPriceEl.textContent = autoClickPrice;
         }
 
-        function startGame() {
-            if (balance < betAmount) {
-                alert("У вас недостаточно монет для ставки!");
-                return;
-            }
-            balance -= betAmount; // Списываем ставку
-            updateBalance();
-            saveBalance();
-
-            document.getElementById('status').style.display = 'none';
-            gameOver = false;
-            table = [];
-            playerHand = [];
-            botHand = [];
-            
-            createDeck();
-            dealCards();
-            trumpSuit = deck[0].suit;
-            
-            let color = (trumpSuit === '♥' || trumpSuit === '♦') ? 'red' : 'black';
-            document.getElementById('trump-info').innerHTML = `Козырь: <span style="color:${color}; font-size:24px;">${trumpSuit}</span>`;
-
-            // Определяем, кто ходит первым
-            let pMin = playerHand.find(c => c.suit === trumpSuit);
-            let bMin = botHand.find(c => c.suit === trumpSuit);
-            if (!pMin && bMin) turn = 'bot';
-            else if (pMin && !bMin) turn = 'player';
-            else if (pMin && bMin) turn = pMin.value < bMin.value ? 'player' : 'bot';
-            else turn = 'player';
-
-            render();
-            if (turn === 'bot') setTimeout(botAttack, 1000);
+        // --- СОХРАНЕНИЕ ---
+        function saveData() {
+            localStorage.setItem('coins', coins);
+            localStorage.setItem('clickPower', clickPower);
+            localStorage.setItem('autoClickLevel', autoClickLevel);
+            localStorage.setItem('clickPowerPrice', clickPowerPrice);
+            localStorage.setItem('autoClickPrice', autoClickPrice);
         }
 
-        function render() {
-            document.getElementById('deck-count').textContent = `Колода: ${deck.length}`;
+        // --- КЛИКЕР ---
+        clickBtn.addEventListener('click', () => {
+            coins += clickPower;
+            updateUI();
+            saveData();
+            if (tg) tg.HapticFeedback.impactOccurred('light');
+        });
 
-            const botHandDiv = document.getElementById('bot-hand');
-            botHandDiv.innerHTML = '';
-            botHand.forEach(() => {
-                let cardDiv = document.createElement('div');
-                cardDiv.className = 'card-back';
-                botHandDiv.appendChild(cardDiv);
-            });
-
-            const tableDiv = document.getElementById('table-zone');
-            tableDiv.innerHTML = '';
-            table.forEach(pair => {
-                let wrapper = document.createElement('div');
-                wrapper.className = 'table-pair';
-                
-                let atk = createCardElement(pair.attack);
-                wrapper.appendChild(atk);
-
-                if (pair.defend) {
-                    let def = createCardElement(pair.defend);
-                    def.classList.add('defend');
-                    wrapper.appendChild(def);
-                }
-                tableDiv.appendChild(wrapper);
-            });
-
-            const playerHandDiv = document.getElementById('player-hand');
-            playerHandDiv.innerHTML = '';
-            playerHand.forEach((card, index) => {
-                let cardEl = createCardElement(card);
-                if (turn === 'player') {
-                    cardEl.onclick = () => playerPlayCard(index);
-                }
-                playerHandDiv.appendChild(cardEl);
-            });
-
-            const btnTake = document.getElementById('btn-take');
-            const btnPass = document.getElementById('btn-pass');
-            
-            if (turn === 'player' && !gameOver) {
-                if (table.length > 0 && table.every(p => p.defend)) {
-                    btnPass.style.display = 'block';
-                    btnTake.style.display = 'none';
-                } else if (table.length > 0 && !table.every(p => p.defend)) {
-                    btnTake.style.display = 'block';
-                    btnPass.style.display = 'none';
-                } else {
-                    btnPass.style.display = 'none';
-                    btnTake.style.display = 'none';
-                }
+        // --- МАГАЗИН ---
+        buyClickPowerBtn.addEventListener('click', () => {
+            if (coins >= clickPowerPrice) {
+                coins -= clickPowerPrice;
+                clickPower += 1;
+                clickPowerPrice = Math.floor(clickPowerPrice * 1.5);
+                updateUI();
+                saveData();
+                if (tg) tg.HapticFeedback.notificationOccurred('success');
             } else {
-                btnTake.style.display = 'none';
-                btnPass.style.display = 'none';
+                if (tg) tg.HapticFeedback.notificationOccurred('error');
             }
-        }
+        });
 
-        function createCardElement(card) {
-            let div = document.createElement('div');
-            div.className = `card ${card.suit === '♥' || card.suit === '♦' ? 'red' : 'black'}`;
-            div.setAttribute('data-rank', card.rank);
-            div.innerHTML = `${card.rank}<br>${card.suit}`;
-            return div;
-        }
+        buyAutoClickBtn.addEventListener('click', () => {
+            if (coins >= autoClickPrice) {
+                coins -= autoClickPrice;
+                autoClickLevel += 1;
+                autoClickPrice = Math.floor(autoClickPrice * 2);
+                updateUI();
+                saveData();
+                if (tg) tg.HapticFeedback.notificationOccurred('success');
+            } else {
+                if (tg) tg.HapticFeedback.notificationOccurred('error');
+            }
+        });
 
-        // --- Игрок ---
-        function playerPlayCard(index) {
-            if (turn !== 'player' || gameOver) return;
-            let card = playerHand[index];
+        // --- АВТОКЛИК ---
+        setInterval(() => {
+            if (autoClickLevel > 0) {
+                coins += autoClickLevel;
+                updateUI();
+                saveData();
+            }
+        }, 1000);
+
+        // --- ЛОГИКА АПГРЕЙДЕРА ---
+        window.setChance = function(chance, multiplier) {
+            if (isUpgrading) return;
+            currentChance = chance;
+            currentMultiplier = multiplier;
             
-            if (table.length === 0) {
-                table.push({ attack: card, defend: null });
-                playerHand.splice(index, 1);
-                turn = 'bot';
-                render();
-                setTimeout(botDefend, 1000);
+            // Меняем ширину зеленой зоны
+            winZone.style.width = chance + '%';
+            
+            // Визуал кнопок
+            document.querySelectorAll('.chance-btn').forEach(btn => btn.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+        }
+
+        window.changeBet = function(amount) {
+            if (isUpgrading) return;
+            let currentBet = parseInt(betInput.value) || 0;
+            let newBet = currentBet + amount;
+            if (newBet < 10) newBet = 10; // Минимальная ставка
+            betInput.value = newBet;
+        }
+
+        window.startUpgrade = function() {
+            if (isUpgrading) return;
+            
+            let bet = parseInt(betInput.value) || 0;
+            if (coins < bet) {
+                upgraderResult.textContent = "Недостаточно монет!";
+                upgraderResult.style.color = "#ff4d4d";
+                if (tg) tg.HapticFeedback.notificationOccurred('error');
                 return;
             }
 
-            let lastUnbeaten = table.find(p => !p.defend);
-            if (lastUnbeaten) {
-                if (canBeat(card, lastUnbeaten.attack)) {
-                    lastUnbeaten.defend = card;
-                    playerHand.splice(index, 1);
-                    render();
-                    setTimeout(botAttack, 1000);
-                } else {
-                    if (tg) tg.HapticFeedback.notificationOccurred('error');
+            // Списываем ставку
+            coins -= bet;
+            updateUI();
+            saveData();
+
+            isUpgrading = true;
+            upgradeActionBtn.disabled = true;
+            upgraderResult.textContent = "";
+            slider.style.transition = "none"; // Убираем плавность для анимации
+            slider.style.left = "0%";
+
+            let currentPos = 0;
+            let speed = 5; // Скорость бегунка
+
+            // Анимация бегунка
+            const animateSlider = setInterval(() => {
+                currentPos += speed;
+                if (currentPos >= 100) {
+                    currentPos = 100;
+                    clearInterval(animateSlider);
+                    finishUpgrade(currentPos, bet);
                 }
-                return;
-            }
-            
-            if (table.every(p => p.defend)) {
-                let allowedRanks = table.map(p => p.attack.rank).concat(table.filter(p=>p.defend).map(p=>p.defend.rank));
-                if (allowedRanks.includes(card.rank)) {
-                    table.push({ attack: card, defend: null });
-                    playerHand.splice(index, 1);
-                    turn = 'bot';
-                    render();
-                    setTimeout(botDefend, 1000);
-                } else {
-                    if (tg) tg.HapticFeedback.notificationOccurred('error');
-                }
-            }
-        }
-
-        // --- Бот ---
-        function botAttack() {
-            if (gameOver) return;
-            if (table.length === 0 && botHand.length > 0) {
-                let card = botHand.shift();
-                table.push({ attack: card, defend: null });
-                turn = 'player';
-                render();
-            } else {
-                let allowedRanks = table.map(p => p.attack.rank).concat(table.filter(p=>p.defend).map(p=>p.defend.rank));
-                let cardToAdd = botHand.find(c => allowedRanks.includes(c.rank));
-                if (cardToAdd && table.length < 6) {
-                    let idx = botHand.indexOf(cardToAdd);
-                    botHand.splice(idx, 1);
-                    table.push({ attack: cardToAdd, defend: null });
-                    turn = 'player';
-                    render();
-                } else {
-                    endRound();
-                }
-            }
-        }
-
-        function botDefend() {
-            if (gameOver) return;
-            let unbeaten = table.find(p => !p.defend);
-            if (!unbeaten) return;
-
-            // Ищем карту для защиты
-            let defendCard = botHand.find(c => canBeat(c, unbeaten.attack));
-            
-            if (defendCard) {
-                let idx = botHand.indexOf(defendCard);
-                botHand.splice(idx, 1);
-                unbeaten.defend = defendCard;
-                render();
-                turn = 'player';
-                setTimeout(botAttack, 1000); // Бот пытается подкинуть
-            } else {
-                // Бот забирает
-                setTimeout(() => {
-                    table.forEach(pair => {
-                        botHand.push(pair.attack);
-                        if (pair.defend) botHand.push(pair.defend);
-                    });
-                    table = [];
-                    turn = 'player';
-                    render();
-                    checkEndGame();
-                }, 800);
-            }
-        }
-
-        function canBeat(defendCard, attackCard) {
-            if (defendCard.suit === attackCard.suit && defendCard.value > attackCard.value) return true;
-            if (defendCard.suit === trumpSuit && attackCard.suit !== trumpSuit) return true;
-            return false;
-        }
-
-        function endRound() {
-            table = [];
-            while (playerHand.length < 6 && deck.length > 0) playerHand.push(deck.pop());
-            while (botHand.length < 6 && deck.length > 0) botHand.push(deck.pop());
-            
-            playerHand.sort((a, b) => a.value - b.value);
-            botHand.sort((a, b) => a.value - b.value);
-            
-            turn = 'player'; // Для простоты игрок всегда начинает новый раунд
-            render();
-            checkEndGame();
-        }
-
-        function checkEndGame() {
-            if (playerHand.length === 0 && deck.length === 0) {
-                gameOver = true;
-                balance += betAmount * 2; // Выиграли x2 от ставки
-                updateBalance();
-                saveBalance();
-                showStatus("Вы выиграли! 🎉", "#4CAF50");
-            } else if (botHand.length === 0 && deck.length === 0) {
-                gameOver = true;
-                showStatus("Вы проиграли! 😢 Бот вышел.", "#f44336");
-            }
-        }
-
-        function showStatus(text, color) {
-            const statusDiv = document.getElementById('status');
-            document.getElementById('status-text').textContent = text;
-            document.getElementById('status-text').style.color = color;
-            statusDiv.style.display = 'block';
-        }
-
-        // --- Кнопки ---
-        document.getElementById('btn-take').onclick = () => {
-            if (turn !== 'player') return;
-            table.forEach(pair => {
-                playerHand.push(pair.attack);
-                if (pair.defend) playerHand.push(pair.defend);
-            });
-            table = [];
-            turn = 'bot';
-            render();
-            setTimeout(botAttack, 1000);
-        };
-
-        document.getElementById('btn-pass').onclick = () => {
-            if (turn !== 'player') return;
-            endRound();
-        };
-
-        function updateBalance() {
-            document.getElementById('balance').textContent = `🪙 ${balance}`;
-        }
-        function saveBalance() {
-            localStorage.setItem('durak_balance', balance);
-        }
-
-        // Запуск
-        updateBalance();
-        startGame();
-    </script>
-</body>
-</html>
+                slider.style.left = currentPos + '%';
+                if (tg) tg.HapticFeedback.selectionChanged(); // Легкая вибрация при движении
+            }, 20); // Чем меньше,
