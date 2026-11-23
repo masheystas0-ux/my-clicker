@@ -1,116 +1,574 @@
-import asyncio
-import random
-from aiogram import Bot, Dispatcher, types, F
-from aiogram.filters import Command
-from aiogram.utils.keyboard import InlineKeyboardBuilder
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Damcrew Hub</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            background-image: url('bp.jpg.png'); 
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+            user-select: none;
+            overflow: hidden;
+            background-color: #111;
+        }
 
-BOT_TOKEN = "ВАШ_ТОКЕН_ОТ_BOTFATHER"
+        /* Верхний блок */
+        #header {
+            background: rgba(0, 0, 0, 0.85);
+            padding: 15px; 
+            padding-top: calc(15px + env(safe-area-inset-top, 40px)); 
+            text-align: center;
+            border-bottom: 2px solid #FFD700;
+            z-index: 10;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-left: 20px;
+            padding-right: 20px;
+        }
 
-bot = Bot(token=BOT_TOKEN)
-dp = Dispatcher()
+        #brand-name {
+            font-size: 20px;
+            font-weight: 900;
+            color: #ff3333;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
 
-# Простая база данных в памяти (для реального проекта лучше использовать SQLite или PostgreSQL)
-users_db = {}
+        #score-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #FFD700;
+            font-size: 24px;
+            font-weight: bold;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 5px 15px;
+            border-radius: 20px;
+        }
 
-# Настройка кейса: (Название, Редкость, Шанс в %, Примерная цена)
-NFT_POOL = [
-    {"name": "🐸 Pepe Punk #104", "rarity": "Обычный", "chance": 60, "price": 50},
-    {"name": "💎 TON Crystal #88", "rarity": "Редкий", "chance": 25, "price": 150},
-    {"name": "👑 Durov's Cap #07", "rarity": "Эпический", "chance": 12, "price": 500},
-    {"name": "🚀 Golden Rocket #01", "rarity": "Легендарный", "chance": 3, "price": 2500},
-]
+        /* Контентная часть */
+        #main-content {
+            flex: 1;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
+        }
 
-CASE_COST = 100  # Стоимость одной прокрутки
+        .tab-content {
+            display: none;
+            width: 100%;
+            height: 100%;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
 
+        .tab-content.active {
+            display: flex;
+        }
 
-def get_user(user_id: int):
-    if user_id not in users_db:
-        # Выдаем 500 монет новичку для теста
-        users_db[user_id] = {"balance": 500, "inventory": []}
-    return users_db[user_id]
+        /* Вкладка Кликер */
+        #click-btn {
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            border: 4px solid #FFD700;
+            background: rgba(255, 215, 0, 0.2);
+            backdrop-filter: blur(5px);
+            color: #fff;
+            font-size: 22px;
+            font-weight: bold;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+            cursor: pointer;
+            transition: transform 0.1s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+        }
+        #click-btn:active { transform: scale(0.9); }
 
+        /* Вкладка Магазин */
+        .upgrade-item {
+            background: rgba(0, 0, 0, 0.85);
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 15px;
+            border: 1px solid #FFD700;
+            color: #fff;
+            width: 85%;
+            max-width: 300px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            text-align: center;
+        }
 
-def main_menu():
-    builder = InlineKeyboardBuilder()
-    builder.button(text=f"🎰 Крутить кейс ({CASE_COST} ⭐️)", callback_data="spin_case")
-    builder.button(text="🎒 Мой инвентарь", callback_data="inventory")
-    builder.button(text="💰 Пополнить (тест +500)", callback_data="add_funds")
-    builder.adjust(1)
-    return builder.as_markup()
+        .upgrade-item button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 16px;
+        }
 
+        /* Вкладка Апгрейдер (Рулетка) */
+        #upgrader-panel {
+            background: rgba(0, 0, 0, 0.9);
+            padding: 20px 10px;
+            border-radius: 20px;
+            border: 2px solid #333;
+            text-align: center;
+            color: #fff;
+            width: 95%;
+            max-width: 360px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+        }
 
-@dp.message(Command("start"))
-async def cmd_start(message: types.Message):
-    user = get_user(message.from_user.id)
-    await message.answer(
-        f"👋 Добро пожаловать в NFT-рулетку!\n"
-        f"Твой баланс: **{user['balance']} ⭐️**\n\n"
-        f"Испытай удачу и выбей редкий NFT:",
-        reply_markup=main_menu(),
-        parse_mode="Markdown"
-    )
+        /* Контейнер для рулетки */
+        #roulette-container {
+            width: 100%;
+            height: 120px;
+            background: #222;
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+            border: 2px solid #555;
+            margin: 20px 0;
+            display: flex;
+            align-items: center;
+        }
 
+        /* Красная линия по центру */
+        #center-line {
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: #ff0000;
+            transform: translateX(-50%);
+            z-index: 10;
+            box-shadow: 0 0 10px #ff0000;
+        }
 
-@dp.callback_query(F.data == "spin_case")
-async def process_spin(callback: types.CallbackQuery):
-    user = get_user(callback.from_user.id)
+        /* Лента с предметами */
+        #roulette-track {
+            display: flex;
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            transition: transform 4s cubic-bezier(0.1, 0.9, 0.2, 1); /* Плавная остановка */
+        }
 
-    if user["balance"] < CASE_COST:
-        await callback.answer("❌ Недостаточно средств на балансе!", show_alert=True)
-        return
+        /* Карточка предмета */
+        .item-card {
+            width: 100px;
+            height: 100%;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border-right: 1px solid #333;
+            background: linear-gradient(180deg, #2a2a2a 0%, #111 100%);
+        }
 
-    # Списываем стоимость прокрутки
-    user["balance"] -= CASE_COST
+        .item-emoji {
+            font-size: 40px;
+            margin-bottom: 5px;
+        }
 
-    # Выбираем случайный NFT с учетом весов (шансов)
-    weights = [item["chance"] for item in NFT_POOL]
-    won_nft = random.choices(NFT_POOL, weights=weights, k=1)[0]
+        .item-price {
+            font-size: 12px;
+            color: #FFD700;
+            font-weight: bold;
+        }
 
-    # Добавляем в инвентарь
-    user["inventory"].append(won_nft)
+        /* Настройки ставки */
+        .bet-controls {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            margin-bottom: 15px;
+            background: #222;
+            padding: 10px;
+            border-radius: 10px;
+        }
 
-    await callback.message.edit_text(
-        f"🎉 **Тебе выпал NFT!**\n\n"
-        f"🎁 Предмет: **{won_nft['name']}**\n"
-        f"✨ Редкость: {won_nft['rarity']}\n"
-        f"💎 Ценность: {won_nft['price']} ⭐️\n\n"
-        f"Остаток баланса: **{user['balance']} ⭐️**",
-        reply_markup=main_menu(),
-        parse_mode="Markdown"
-    )
-    await callback.answer()
+        .bet-controls button {
+            background: #444;
+            color: #fff;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            font-size: 20px;
+            font-weight: bold;
+        }
 
+        .bet-input {
+            background: transparent;
+            color: #FFD700;
+            border: none;
+            font-size: 24px;
+            font-weight: bold;
+            text-align: center;
+            width: 100px;
+            outline: none;
+        }
 
-@dp.callback_query(F.data == "inventory")
-async def show_inventory(callback: types.CallbackQuery):
-    user = get_user(callback.from_user.id)
-    inv = user["inventory"]
+        #upgrade-action-btn {
+            width: 100%;
+            background: linear-gradient(90deg, #ff3333, #ff6666);
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 15px;
+            font-size: 20px;
+            font-weight: bold;
+            box-shadow: 0 5px 15px rgba(255, 51, 51, 0.4);
+            text-transform: uppercase;
+        }
+        #upgrade-action-btn:disabled {
+            background: #555;
+            box-shadow: none;
+            color: #888;
+        }
 
-    if not inv:
-        text = "🎒 Твой инвентарь пока пуст. Крути кейс!"
-    else:
-        items_text = "\n".join([f"• {item['name']} ({item['rarity']}) — {item['price']} ⭐️" for item in inv])
-        text = f"🎒 **Твои NFT ({len(inv)} шт.):**\n\n{items_text}"
+        /* Нижняя панель навигации */
+        #nav-bar {
+            display: flex;
+            background: rgba(0, 0, 0, 0.95);
+            border-top: 2px solid #333;
+            padding: 10px 0;
+            padding-bottom: max(10px, env(safe-area-inset-bottom)); 
+        }
 
-    await callback.message.edit_text(text, reply_markup=main_menu(), parse_mode="Markdown")
-    await callback.answer()
+        .nav-btn {
+            flex: 1;
+            background: none;
+            border: none;
+            color: #888;
+            font-size: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            transition: color 0.3s;
+        }
 
+        .nav-btn.active {
+            color: #ff3333; /* Красный цвет как у логотипа */
+        }
 
-@dp.callback_query(F.data == "add_funds")
-async def add_test_funds(callback: types.CallbackQuery):
-    user = get_user(callback.from_user.id)
-    user["balance"] += 500
-    await callback.answer("✅ Начислено 500 тестовых ⭐️!", show_alert=True)
-    await callback.message.edit_text(
-        f"Твой баланс пополнен!\nТекущий баланс: **{user['balance']} ⭐️**",
-        reply_markup=main_menu(),
-        parse_mode="Markdown"
-    )
+        .nav-btn span {
+            font-size: 20px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Верхний блок -->
+    <div id="header">
+        <div id="brand-name">DAMCREW HUB</div>
+        <div id="score-container">
+            <span>🪙</span>
+            <div id="score">0</div>
+        </div>
+    </div>
 
+    <div id="main-content">
+        <!-- Вкладка 1: Кликер -->
+        <div id="tab-clicker" class="tab-content active">
+            <button id="click-btn">+1 🪙</button>
+        </div>
 
-async def main():
-    await dp.start_polling(bot)
+        <!-- Вкладка 2: Магазин -->
+        <div id="tab-shop" class="tab-content">
+            <div class="upgrade-item">
+                <span>Сила клика: <b id="click-power-lvl">1</b></span>
+                <button id="buy-click-power">Улучшить (+1 за клик) - <span id="click-power-price">10</span> 🪙</button>
+            </div>
+            <div class="upgrade-item">
+                <span>Автоклик: <b id="auto-click-lvl">0</b></span>
+                <button id="buy-auto-click">Купить (+1 🪙/сек) - <span id="auto-click-price">50</span> 🪙</button>
+            </div>
+        </div>
 
+        <!-- Вкладка 3: Апгрейдер (Рулетка) -->
+        <div id="tab-upgrader" class="tab-content">
+            <div id="upgrader-panel">
+                <h2 style="margin: 0; color: #ff3333;">🎰 АПГРЕЙДЕР</h2>
+                <p style="font-size: 12px; color: #aaa; margin-top: 5px;">Крути рулетку и забирай предметы!</p>
+                
+                <div id="roulette-container">
+                    <div id="center-line"></div>
+                    <div id="roulette-track">
+                        <!-- Сюда JS будет добавлять карточки -->
+                    </div>
+                </div>
 
-if __name__ == "__main__":
-    asyncio.run(main())
+                <div class="bet-controls">
+                    <button onclick="changeBet(-50)">-</button>
+                    <input type="number" id="bet-amount" class="bet-input" value="100" readonly>
+                    <button onclick="changeBet(50)">+</button>
+                </div>
+
+                <button id="upgrade-action-btn" onclick="spinRoulette()">Крутить</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Нижняя навигация -->
+    <div id="nav-bar">
+        <button class="nav-btn active" onclick="switchTab('clicker')">
+            <span>🏠</span> Кликер
+        </button>
+        <button class="nav-btn" onclick="switchTab('shop')">
+            <span>🛒</span> Магазин
+        </button>
+        <button class="nav-btn" onclick="switchTab('upgrader')">
+            <span>🎰</span> Апгрейд
+        </button>
+    </div>
+
+    <script>
+        const tg = window.Telegram?.WebApp;
+        if (tg) {
+            tg.ready();
+            tg.expand();
+        }
+
+        // --- ЗАГРУЗКА ДАННЫХ ---
+        let coins = parseInt(localStorage.getItem('coins')) || 0;
+        let clickPower = parseInt(localStorage.getItem('clickPower')) || 1;
+        let autoClickLevel = parseInt(localStorage.getItem('autoClickLevel')) || 0;
+        let savedClickPrice = localStorage.getItem('clickPowerPrice');
+        let clickPowerPrice = savedClickPrice !== null ? parseInt(savedClickPrice) : 10;
+        let savedAutoPrice = localStorage.getItem('autoClickPrice');
+        let autoClickPrice = savedAutoPrice !== null ? parseInt(savedAutoPrice) : 50;
+
+        // --- СПИСОК ПРЕДМЕТОВ (ИЗ ВАШЕГО СКРИНШОТА) ---
+        // Я взял цены с картинки и подобрал подходящие эмодзи
+        const items = [
+            { emoji: '🎄', name: 'Венок', price: 75 },
+            { emoji: '🎅', name: 'Колпак', price: 75 },
+            { emoji: '⛄', name: 'Снеговик', price: 15 },
+            { emoji: '🎁', name: 'Подарок', price: 75 },
+            { emoji: '🔔', name: 'Колокольчик', price: 200 },
+            { emoji: '🧸', name: 'Мишка', price: 500 },
+            { emoji: '👑', name: 'Корона', price: 1000 },
+            { emoji: '⌚', name: 'Часы', price: 300 },
+            { emoji: '💎', name: 'Алмаз', price: 500 },
+            { emoji: '💍', name: 'Кольцо', price: 3000 },
+            { emoji: '👜', name: 'Сумка', price: 2500 },
+            { emoji: '🧪', name: 'Зелье', price: 1000 },
+            { emoji: '🍬', name: 'Конфета', price: 100 },
+            { emoji: '🕯️', name: 'Свеча', price: 10 }
+        ];
+
+        // --- ЭЛЕМЕНТЫ ---
+        const scoreElement = document.getElementById('score');
+        const clickBtn = document.getElementById('click-btn');
+        const betInput = document.getElementById('bet-amount');
+        const rouletteTrack = document.getElementById('roulette-track');
+        const upgradeActionBtn = document.getElementById('upgrade-action-btn');
+        
+        let isSpinning = false;
+
+        // --- НАВИГАЦИЯ ---
+        window.switchTab = function(tabName) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('tab-' + tabName).classList.add('active');
+            event.currentTarget.classList.add('active');
+            if (tg) tg.HapticFeedback.selectionChanged();
+        }
+
+        // --- ОБНОВЛЕНИЕ ИНТЕРФЕЙСА ---
+        function updateUI() {
+            scoreElement.textContent = Math.floor(coins);
+            clickBtn.textContent = `+${clickPower} 🪙`;
+            document.getElementById('click-power-lvl').textContent = clickPower;
+            document.getElementById('auto-click-lvl').textContent = autoClickLevel;
+            document.getElementById('click-power-price').textContent = clickPowerPrice;
+            document.getElementById('auto-click-price').textContent = autoClickPrice;
+        }
+
+        function saveData() {
+            localStorage.setItem('coins', coins);
+            localStorage.setItem('clickPower', clickPower);
+            localStorage.setItem('autoClickLevel', autoClickLevel);
+            localStorage.setItem('clickPowerPrice', clickPowerPrice);
+            localStorage.setItem('autoClickPrice', autoClickPrice);
+        }
+
+        // --- КЛИКЕР ---
+        clickBtn.addEventListener('click', () => {
+            coins += clickPower;
+            updateUI();
+            saveData();
+            if (tg) tg.HapticFeedback.impactOccurred('light');
+        });
+
+        // --- МАГАЗИН ---
+        document.getElementById('buy-click-power').addEventListener('click', () => {
+            if (coins >= clickPowerPrice) {
+                coins -= clickPowerPrice;
+                clickPower += 1;
+                clickPowerPrice = Math.floor(clickPowerPrice * 1.5);
+                updateUI();
+                saveData();
+                if (tg) tg.HapticFeedback.notificationOccurred('success');
+            }
+        });
+
+        document.getElementById('buy-auto-click').addEventListener('click', () => {
+            if (coins >= autoClickPrice) {
+                coins -= autoClickPrice;
+                autoClickLevel += 1;
+                autoClickPrice = Math.floor(autoClickPrice * 2);
+                updateUI();
+                saveData();
+                if (tg) tg.HapticFeedback.notificationOccurred('success');
+            }
+        });
+
+        // --- АВТОКЛИК ---
+        setInterval(() => {
+            if (autoClickLevel > 0) {
+                coins += autoClickLevel;
+                updateUI();
+                saveData();
+            }
+        }, 1000);
+
+        // --- АПГРЕЙДЕР (РУЛЕТКА) ---
+        window.changeBet = function(amount) {
+            if (isSpinning) return;
+            let currentBet = parseInt(betInput.value) || 0;
+            let newBet = currentBet + amount;
+            if (newBet < 50) newBet = 50; // Минимальная ставка 50
+            betInput.value = newBet;
+        }
+
+        // Функция для генерации ленты
+        function generateTrack() {
+            // Генерируем 50 случайных предметов для ленты
+            let html = '';
+            for (let i = 0; i < 50; i++) {
+                let randomItem = items[Math.floor(Math.random() * items.length)];
+                html += `
+                    <div class="item-card">
+                        <div class="item-emoji">${randomItem.emoji}</div>
+                        <div class="item-price">${randomItem.price} 🪙</div>
+                    </div>
+                `;
+            }
+            return html;
+        }
+
+        window.spinRoulette = function() {
+            if (isSpinning) return;
+            let bet = parseInt(betInput.value) || 0;
+            
+            if (coins < bet) {
+                if (tg) tg.HapticFeedback.notificationOccurred('error');
+                return alert("Недостаточно монет!");
+            }
+
+            // Списываем ставку
+            coins -= bet;
+            updateUI();
+            saveData();
+
+            isSpinning = true;
+            upgradeActionBtn.disabled = true;
+            upgradeActionBtn.textContent = "Крутим...";
+
+            // 1. Заполняем ленту случайными предметами
+            rouletteTrack.innerHTML = generateTrack();
+            rouletteTrack.style.transition = "none";
+            rouletteTrack.style.transform = "translateX(0px)";
+
+            // Даем браузеру прогрузить ленту, затем запускаем анимацию
+            setTimeout(() => {
+                // 2. Выбираем выигрышный предмет (пока случайно, вне зависимости от ставки)
+                // В идеале: если ставка большая, шанс на дорогой предмет выше.
+                let winItem = items[Math.floor(Math.random() * items.length)];
+                
+                // Мы должны понять, на какую карточку нам нужно остановиться.
+                // Лента состоит из карточек по 100px.
+                // Мы хотим, чтобы выигрышный предмет оказался ровно по центру (где красная линия).
+                // Выбираем случайную карточку во второй половине ленты (чтобы анимация длилась дольше).
+                let winIndex = Math.floor(Math.random() * 20) + 25; // от 25 до 45
+                
+                // Заменяем сгенерированную карточку на выигрышную
+                let cards = rouletteTrack.children;
+                cards[winIndex].querySelector('.item-emoji').textContent = winItem.emoji;
+                cards[winIndex].querySelector('.item-price').textContent = winItem.price + ' 🪙';
+
+                // 3. Вычисляем смещение.
+                // Ширина карточки = 100px.
+                // Чтобы карточка winIndex оказалась по центру (50% экрана), 
+                // нужно сдвинуть ленту влево.
+                // Центр экрана = ширина контейнера / 2.
+                let containerWidth = document.getElementById('roulette-container').offsetWidth;
+                let centerOffset = containerWidth / 2;
+                
+                // Позиция центра карточки в пикселях
+                let cardCenter = (winIndex * 100) + 50; 
+                
+                // Итоговый сдвиг (плюс небольшая случайность, чтобы не всегда идеально в центр)
+                let randomOffset = Math.floor(Math.random() * 80) - 40; 
+                let moveDistance = cardCenter - centerOffset + randomOffset;
+
+                // Запускаем анимацию
+                rouletteTrack.style.transition = "transform 4s cubic-bezier(0.1, 0.9, 0.2, 1)";
+                rouletteTrack.style.transform = `translateX(-${moveDistance}px)`;
+
+                // 4. Ждем окончания анимации и начисляем выигрыш
+                setTimeout(() => {
+                    isSpinning = false;
+                    upgradeActionBtn.disabled = false;
+                    upgradeActionBtn.textContent = "Крутить";
+                    
+                    coins += winItem.price;
+                    updateUI();
+                    saveData();
+                    if (tg) tg.HapticFeedback.notificationOccurred('success');
+                    
+                    // Небольшая вибрация в конце
+                    setTimeout(() => { if (tg) tg.HapticFeedback.impactOccurred('heavy'); }, 100);
+
+                }, 4100); // Ждем 4.1 секунды (чуть больше времени анимации)
+
+            }, 50);
+        }
+
+        // Инициализация
+        updateUI();
+    </script>
+</body>
+</html>
