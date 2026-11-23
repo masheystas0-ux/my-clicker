@@ -1,653 +1,242 @@
-
+ 
 <!DOCTYPE html>
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<meta name="theme-color" content="#090a12">
-<title>ULTIMATE SELLER KIT PRO</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Crypto Wallet</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>
-:root {
-  --bg:#090a12;
-  --panel:#121421;
-  --panel2:#191c2d;
-  --border:#292d43;
-  --text:#f4f5ff;
-  --muted:#9298b3;
-  --purple:#8b5cf6;
-  --blue:#4f8cff;
-  --green:#36d399;
-  --red:#ff647c;
-}
-*{box-sizing:border-box}
+*{box-sizing:border-box;margin:0;padding:0}
 body{
-  margin:0;background:var(--bg);color:var(--text);
-  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+ background:#101114;color:#fff;
+ font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+ min-height:100vh;padding-bottom:95px;
 }
-button,input,textarea,select{font:inherit}
-button{cursor:pointer}
-.app{max-width:1100px;margin:auto;padding:18px 15px 45px}
-.header{
-  display:flex;justify-content:space-between;align-items:center;
-  gap:12px;margin-bottom:22px;
+button{font:inherit;border:0;cursor:pointer}
+.app{max-width:480px;margin:auto;padding:20px 17px}
+.top{display:flex;justify-content:space-between;align-items:center;margin:8px 0 27px}
+.logo{display:flex;align-items:center;gap:10px;font-size:20px;font-weight:750}
+.logo-icon{background:#2589ff;width:38px;height:38px;border-radius:13px;display:grid;place-items:center;font-size:20px}
+.avatar{width:39px;height:39px;background:#272b34;border-radius:50%;display:grid;place-items:center;font-size:17px}
+.balance{
+ background:linear-gradient(135deg,#176fe0,#1246a6);
+ border-radius:24px;padding:24px 22px;
+ position:relative;overflow:hidden;
+ box-shadow:0 12px 35px #0759bd30;
 }
-.logo{display:flex;align-items:center;gap:10px}
-.logo-icon{
-  width:43px;height:43px;border-radius:14px;
-  display:grid;place-items:center;
-  background:linear-gradient(135deg,#8b5cf6,#4269e9);
-  font-size:22px;box-shadow:0 5px 25px #7654ef55;
+.balance:after{content:"₮";position:absolute;font-size:190px;color:#ffffff0c;right:4px;top:-47px;font-weight:800}
+.balance-label{font-size:14px;color:#d0e3ff}
+.balance-value{font-size:37px;font-weight:750;margin:12px 0 7px;letter-spacing:-1px}
+.balance-bottom{font-size:13px;color:#c5dcff}
+.actions{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:23px 0 28px}
+.action{background:#1b1d23;border-radius:17px;padding:15px 3px 12px;text-align:center;color:white}
+.action-icon{width:43px;height:43px;background:#282e3b;border-radius:14px;display:grid;place-items:center;margin:auto auto 9px;font-size:21px}
+.action span{font-size:12px;color:#e1e4eb}
+.section-title{display:flex;justify-content:space-between;align-items:center;margin:25px 0 14px}
+.section-title h3{font-size:18px}
+.section-title button{background:none;color:#4195ff;font-size:13px}
+.coin-list{display:flex;flex-direction:column;gap:9px}
+.coin{background:#1b1d23;border-radius:17px;padding:14px;display:flex;align-items:center;gap:12px}
+.coin-icon{width:43px;height:43px;border-radius:50%;display:grid;place-items:center;font-weight:800;font-size:18px}
+.usdt{background:#1a9b80}.ton{background:#1888d4}.btc{background:#e99a35;color:#fff}.eth{background:#6475bd}
+.coin-info{flex:1}
+.coin-name{font-size:15px;font-weight:650}
+.coin-symbol{font-size:12px;color:#8d929e;margin-top:4px}
+.coin-price{text-align:right}
+.coin-amount{font-size:15px;font-weight:650}
+.coin-change{font-size:12px;color:#29c78b;margin-top:4px}
+.transaction{background:#1b1d23;border-radius:15px;padding:14px;display:flex;align-items:center;gap:12px;margin-bottom:9px}
+.tx-icon{width:40px;height:40px;background:#282e3b;border-radius:13px;display:grid;place-items:center;font-size:18px}
+.tx-info{flex:1}
+.tx-name{font-size:14px;font-weight:600}
+.tx-date{font-size:12px;color:#8e929e;margin-top:4px}
+.tx-value{font-size:14px;font-weight:650}
+.positive{color:#2bc88b}.negative{color:#fff}
+.nav{
+ position:fixed;bottom:0;left:0;right:0;
+ background:#17191e;border-top:1px solid #292b32;
+ display:flex;justify-content:space-around;
+ padding:12px 5px calc(12px + env(safe-area-inset-bottom));
+ z-index:10;
 }
-.logo h1{font-size:17px;margin:0;font-weight:900;letter-spacing:.4px}
-.logo small{color:var(--muted);font-size:10px;letter-spacing:2px}
-.status{
-  font-size:11px;color:var(--green);background:#36d39915;
-  border:1px solid #36d39935;padding:7px 10px;border-radius:20px;
-}
-.hero{
-  padding:25px 22px;border-radius:22px;
-  background:radial-gradient(circle at 90% 0%,#7449d555,transparent 40%),
-  linear-gradient(125deg,#1c1c35,#111321);
-  border:1px solid #393458;margin-bottom:19px;
-}
-.hero-label{color:#b8a2ff;font-size:11px;font-weight:800;letter-spacing:2px}
-.hero h2{font-size:27px;margin:10px 0 7px;line-height:1.15}
-.hero p{color:#a9acc3;font-size:13px;line-height:1.5;margin:0}
-.stats{
-  display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px;
-}
-.stat{
-  background:var(--panel);border:1px solid var(--border);
-  padding:14px 12px;border-radius:16px;min-width:0;
-}
-.stat .label{font-size:10px;color:var(--muted)}
-.stat .value{font-size:20px;font-weight:850;margin-top:8px;overflow-wrap:anywhere}
-.green{color:var(--green)}
-.purple{color:#b39aff}
-.red{color:var(--red)}
-.tabs{
-  display:flex;gap:8px;overflow-x:auto;padding:2px 0 13px;
-  scrollbar-width:none;margin-bottom:7px;
-}
-.tabs::-webkit-scrollbar{display:none}
-.tab{
-  flex-shrink:0;background:var(--panel);color:var(--muted);
-  border:1px solid var(--border);padding:10px 14px;
-  border-radius:12px;font-size:12px;font-weight:700;
-}
-.tab.active{background:#7952db25;color:#c7b5ff;border-color:#8059e9}
-.page{display:none}
-.page.active{display:block}
-.card{
-  background:var(--panel);border:1px solid var(--border);
-  border-radius:18px;padding:18px;margin-bottom:13px;
-}
-.card h3{font-size:16px;margin:0 0 7px}
-.desc{color:var(--muted);font-size:12px;line-height:1.5;margin:0 0 16px}
-.field{margin-bottom:13px}
-label{display:block;color:#b5bad1;font-size:12px;margin-bottom:7px}
-input,textarea,select{
-  width:100%;background:#0b0d18;border:1px solid var(--border);
-  color:var(--text);border-radius:11px;padding:12px;
-  outline:none;min-width:0;
-}
-input:focus,textarea:focus,select:focus{border-color:var(--purple)}
-textarea{resize:vertical;min-height:115px;line-height:1.5}
-select option{background:#121421}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:11px}
-.btn{
-  border:0;border-radius:11px;padding:12px 15px;
-  font-weight:800;font-size:12px;color:white;
-  background:linear-gradient(135deg,#8b5cf6,#5b65e9);
-}
-.btn.secondary{background:#252940;border:1px solid #383d58;color:#d9dcf3}
-.btn.greenbtn{background:linear-gradient(135deg,#20b987,#159b78)}
-.btn.redbtn{background:#512431;color:#ff9bac}
-.btn.full{width:100%}
-.btn:active{transform:scale(.98)}
-.actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:12px}
-.result{
-  background:#0b0d18;border:1px solid #30334a;
-  border-radius:13px;padding:14px;margin-top:14px;
-}
-.result textarea{border:0;padding:0;background:transparent;min-height:130px}
-.result-title{font-size:11px;color:#a99aff;margin-bottom:10px;font-weight:800}
-.notice{font-size:11px;color:var(--muted);line-height:1.5;margin-top:12px}
-.big-number{font-size:29px;font-weight:900;margin:10px 0}
-.sale-item{
-  background:#0d0f1b;border:1px solid var(--border);
-  padding:13px;border-radius:13px;margin-top:9px;
-}
-.sale-top{display:flex;justify-content:space-between;gap:10px}
-.sale-name{font-size:13px;font-weight:800}
-.sale-meta{color:var(--muted);font-size:11px;margin-top:6px}
-.empty{text-align:center;padding:28px;color:var(--muted);font-size:12px}
-.footer{text-align:center;color:#666d89;font-size:10px;margin-top:27px;line-height:1.7}
-.divider{height:1px;background:var(--border);margin:15px 0}
-@media(max-width:520px){
-  .app{padding:14px 12px 35px}
-  .hero h2{font-size:24px}
-  .stats{gap:7px}
-  .stat{padding:12px 9px}
-  .stat .value{font-size:17px}
-  .grid2{gap:8px}
-  .card{padding:15px}
-}
+.nav button{background:none;color:#777e8b;display:flex;flex-direction:column;align-items:center;gap:5px;font-size:11px}
+.nav button b{font-size:21px;font-weight:400}
+.nav button.active{color:#3994ff}
+.page{display:none}.page.active{display:block}
+.modal-bg{position:fixed;inset:0;background:#000a;z-index:20;display:none;align-items:flex-end;justify-content:center}
+.modal-bg.show{display:flex}
+.modal{background:#1b1d23;border-radius:25px 25px 0 0;padding:25px 20px 35px;width:100%;max-width:480px}
+.modal h2{font-size:21px;margin-bottom:20px}
+.modal input,.modal select{width:100%;background:#292c34;color:white;border:1px solid #383c46;border-radius:13px;padding:16px;margin-bottom:13px;font-size:16px;outline:none}
+.primary{background:#2589ff;color:white;width:100%;padding:16px;border-radius:14px;font-weight:700;margin-top:5px}
+.close{float:right;background:#30343d;color:white;border-radius:50%;width:32px;height:32px;font-size:18px}
+.notice{color:#8e929e;font-size:12px;text-align:center;margin-top:15px}
+.empty{text-align:center;color:#8e929e;padding:35px 10px}
 </style>
 </head>
 <body>
 <div class="app">
+<div class="top">
+ <div class="logo"><div class="logo-icon">₮</div> Crypto Wallet</div>
+ <div class="avatar">👤</div>
+</div>
 
-<header class="header">
-  <div class="logo">
-    <div class="logo-icon">⚡</div>
-    <div>
-      <h1>ULTIMATE SELLER KIT</h1>
-      <small>PRO EDITION</small>
-    </div>
-  </div>
-  <div class="status">● OFFLINE READY</div>
-</header>
+<div id="home" class="page active">
+ <div class="balance">
+  <div class="balance-label">Общий баланс</div>
+  <div class="balance-value" id="total">$12,458.90</div>
+  <div class="balance-bottom">≈ Ваш виртуальный портфель</div>
+ </div>
 
-<section class="hero">
-  <div class="hero-label">YOUR BUSINESS TOOLBOX</div>
-  <h2>Продавай умнее.<br>Зарабатывай больше.</h2>
-  <p>Инструменты для создания объявлений, расчёта прибыли и контроля продаж — в одном месте.</p>
-</section>
+ <div class="actions">
+  <button class="action" onclick="openModal('send')"><div class="action-icon">↗</div><span>Отправить</span></button>
+  <button class="action" onclick="openModal('receive')"><div class="action-icon">↙</div><span>Получить</span></button>
+  <button class="action" onclick="openModal('exchange')"><div class="action-icon">⇄</div><span>Обменять</span></button>
+  <button class="action" onclick="showPage('assets')"><div class="action-icon">▤</div><span>Активы</span></button>
+ </div>
 
-<section class="stats">
-  <div class="stat">
-    <div class="label">Общая выручка</div>
-    <div class="value purple" id="totalRevenue">0 ₽</div>
-  </div>
-  <div class="stat">
-    <div class="label">Чистая прибыль</div>
-    <div class="value green" id="totalProfit">0 ₽</div>
-  </div>
-  <div class="stat">
-    <div class="label">Продажи</div>
-    <div class="value" id="totalSales">0</div>
-  </div>
-</section>
+ <div class="section-title"><h3>Мои активы</h3><button onclick="showPage('assets')">Все активы →</button></div>
+ <div class="coin-list" id="homeCoins"></div>
 
-<nav class="tabs">
-  <button class="tab active" data-page="home">🏠 Главная</button>
-  <button class="tab" data-page="titles">✍️ Названия</button>
-  <button class="tab" data-page="description">📝 Описания</button>
-  <button class="tab" data-page="ads">📢 Реклама</button>
-  <button class="tab" data-page="calculator">🧮 Калькулятор</button>
-  <button class="tab" data-page="sales">💰 Продажи</button>
-  <button class="tab" data-page="backup">⚙️ Данные</button>
-</nav>
+ <div class="section-title"><h3>Последние операции</h3><button onclick="showPage('history')">Все →</button></div>
+ <div id="homeTransactions"></div>
+</div>
 
-<!-- HOME -->
-<section class="page active" id="home">
-  <div class="card">
-    <h3>🚀 Панель продавца</h3>
-    <p class="desc">Всё необходимое для работы с цифровыми товарами и объявлениями.</p>
-    <div class="grid2">
-      <button class="btn" onclick="go('titles')">Создать название</button>
-      <button class="btn secondary" onclick="go('description')">Написать описание</button>
-      <button class="btn secondary" onclick="go('calculator')">Посчитать прибыль</button>
-      <button class="btn secondary" onclick="go('sales')">Добавить продажу</button>
-    </div>
-  </div>
-  <div class="card">
-    <h3>💡 Совет продавцу</h3>
-    <p class="desc" id="tip">Хорошее объявление должно сразу объяснять покупателю, что он получит, как это работает и какие условия покупки.</p>
-    <button class="btn secondary" onclick="newTip()">Другой совет</button>
-  </div>
-  <div class="card">
-    <h3>📊 Последние продажи</h3>
-    <div id="recentSales"></div>
-  </div>
-</section>
+<div id="assets" class="page">
+ <div class="section-title"><h3>Мои активы</h3></div>
+ <div class="coin-list" id="allCoins"></div>
+ <p class="notice">Все балансы демонстрационные</p>
+</div>
 
-<!-- TITLES -->
-<section class="page" id="titles">
-  <div class="card">
-    <h3>✍️ Генератор названий</h3>
-    <p class="desc">Создавай привлекательные заголовки для своих товаров.</p>
-    <div class="field">
-      <label>Название товара или услуги</label>
-      <input id="titleProduct" placeholder="Например: HTML игра">
-    </div>
-    <div class="field">
-      <label>Стиль заголовка</label>
-      <select id="titleStyle">
-        <option value="premium">Премиальный</option>
-        <option value="simple">Простой и понятный</option>
-        <option value="attention">Привлекающий внимание</option>
-        <option value="professional">Профессиональный</option>
-      </select>
-    </div>
-    <button class="btn full" onclick="generateTitle()">✨ Создать варианты</button>
-    <div id="titleResult"></div>
-  </div>
-</section>
+<div id="history" class="page">
+ <div class="section-title"><h3>История операций</h3></div>
+ <div id="allTransactions"></div>
+</div>
 
-<!-- DESCRIPTION -->
-<section class="page" id="description">
-  <div class="card">
-    <h3>📝 Генератор описаний</h3>
-    <p class="desc">Сформируй готовый текст объявления за несколько секунд.</p>
-    <div class="field">
-      <label>Название товара</label>
-      <input id="descProduct" placeholder="Например: DOG COMBAT">
-    </div>
-    <div class="field">
-      <label>Что получает покупатель?</label>
-      <textarea id="descContent" placeholder="Например: HTML-файл игры, исходный код, возможность редактирования..."></textarea>
-    </div>
-    <div class="grid2">
-      <div class="field">
-        <label>Цена (₽)</label>
-        <input id="descPrice" type="number" placeholder="150">
-      </div>
-      <div class="field">
-        <label>Стиль</label>
-        <select id="descStyle">
-          <option value="premium">Премиальный</option>
-          <option value="short">Короткий</option>
-          <option value="friendly">Дружелюбный</option>
-        </select>
-      </div>
-    </div>
-    <button class="btn full" onclick="generateDescription()">✨ Сгенерировать описание</button>
-    <div id="descriptionResult"></div>
-  </div>
-</section>
+<div id="profile" class="page">
+ <div class="section-title"><h3>Профиль</h3></div>
+ <div class="coin" style="margin-bottom:15px">
+  <div class="avatar">👤</div>
+  <div class="coin-info"><div class="coin-name">Пользователь</div><div class="coin-symbol">Мой криптокошелёк</div></div>
+ </div>
+ <div class="coin" onclick="alert('Демонстрационная версия')">⚙️ Настройки</div>
+ <div class="coin" style="margin-top:10px" onclick="alert('Crypto Wallet Demo v1.0')">ℹ️ О приложении</div>
+ <p class="notice">Это демонстрационный интерфейс. Реальных денежных средств здесь нет.</p>
+</div>
+</div>
 
-<!-- ADS -->
-<section class="page" id="ads">
-  <div class="card">
-    <h3>📢 Генератор рекламы</h3>
-    <p class="desc">Создай рекламное сообщение для публикации или рассылки.</p>
-    <div class="field">
-      <label>Товар</label>
-      <input id="adProduct" placeholder="Например: набор HTML игр">
-    </div>
-    <div class="field">
-      <label>Главное преимущество</label>
-      <input id="adBenefit" placeholder="Например: работает без интернета">
-    </div>
-    <div class="field">
-      <label>Цена (₽)</label>
-      <input id="adPrice" type="number" placeholder="150">
-    </div>
-    <button class="btn full" onclick="generateAd()">📣 Создать рекламу</button>
-    <div id="adResult"></div>
-  </div>
-</section>
+<div class="nav">
+ <button class="active" onclick="showPage('home',this)"><b>⌂</b>Главная</button>
+ <button onclick="showPage('assets',this)"><b>◈</b>Активы</button>
+ <button onclick="showPage('history',this)"><b>↕</b>История</button>
+ <button onclick="showPage('profile',this)"><b>♙</b>Профиль</button>
+</div>
 
-<!-- CALCULATOR -->
-<section class="page" id="calculator">
-  <div class="card">
-    <h3>🧮 Калькулятор прибыли</h3>
-    <p class="desc">Учитывай комиссию площадки и себестоимость товара.</p>
-    <div class="field">
-      <label>Цена продажи (₽)</label>
-      <input id="calcPrice" type="number" value="150" min="0" oninput="calculate()">
-    </div>
-    <div class="field">
-      <label>Комиссия площадки (%)</label>
-      <input id="calcFee" type="number" value="0" min="0" max="100" oninput="calculate()">
-    </div>
-    <div class="field">
-      <label>Себестоимость (₽)</label>
-      <input id="calcCost" type="number" value="0" min="0" oninput="calculate()">
-    </div>
-    <div class="result">
-      <div class="result-title">ТВОЙ РАСЧЁТ</div>
-      <div class="desc">Комиссия</div>
-      <div class="big-number red" id="calcCommission">0 ₽</div>
-      <div class="desc">Прибыль с одной продажи</div>
-      <div class="big-number green" id="calcProfit">150 ₽</div>
-      <div class="desc">Прибыль с 10 продаж</div>
-      <div class="big-number purple" id="calcTen">1 500 ₽</div>
-    </div>
-    <p class="notice">Укажи реальную комиссию своей площадки. По умолчанию она равна 0%.</p>
-  </div>
-</section>
-
-<!-- SALES -->
-<section class="page" id="sales">
-  <div class="card">
-    <h3>💰 Учёт продаж</h3>
-    <p class="desc">Записывай продажи и следи за своим заработком.</p>
-    <div class="field">
-      <label>Название товара</label>
-      <input id="saleName" placeholder="Например: Ultimate Seller Kit">
-    </div>
-    <div class="grid2">
-      <div class="field">
-        <label>Цена (₽)</label>
-        <input id="salePrice" type="number" min="0" placeholder="150">
-      </div>
-      <div class="field">
-        <label>Комиссия (%)</label>
-        <input id="saleFee" type="number" min="0" max="100" value="0">
-      </div>
-    </div>
-    <div class="field">
-      <label>Себестоимость (₽)</label>
-      <input id="saleCost" type="number" min="0" value="0">
-    </div>
-    <button class="btn greenbtn full" onclick="addSale()">＋ Добавить продажу</button>
-  </div>
-  <div class="card">
-    <h3>📋 История операций</h3>
-    <div id="salesList"></div>
-    <div class="divider"></div>
-    <button class="btn redbtn full" onclick="clearSales()">Удалить всю историю</button>
-  </div>
-</section>
-
-<!-- BACKUP -->
-<section class="page" id="backup">
-  <div class="card">
-    <h3>⚙️ Настройки и данные</h3>
-    <p class="desc">Твои продажи сохраняются в памяти браузера на этом устройстве.</p>
-    <button class="btn full" onclick="exportData()">📥 Скачать резервную копию</button>
-    <div class="field" style="margin-top:14px">
-      <label>Восстановить данные из JSON</label>
-      <input type="file" id="importFile" accept=".json,application/json">
-    </div>
-    <button class="btn secondary full" onclick="importData()">📤 Импортировать данные</button>
-    <div class="divider"></div>
-    <h3>📱 Информация о проекте</h3>
-    <p class="desc">
-      ULTIMATE SELLER KIT PRO<br>
-      Версия 1.0<br>
-      Формат: один HTML-файл<br>
-      Работа: локально в браузере<br>
-      Внешние API: не используются
-    </p>
-    <p class="notice">Не очищай данные браузера, если хочешь сохранить историю продаж. Для переноса на другое устройство используй резервную копию.</p>
-  </div>
-</section>
-
-<footer class="footer">
-  ULTIMATE SELLER KIT PRO © 2026<br>
-  YOUR BUSINESS. YOUR RULES.
-</footer>
+<div class="modal-bg" id="modalBg" onclick="if(event.target===this)closeModal()">
+ <div class="modal">
+  <button class="close" onclick="closeModal()">×</button>
+  <h2 id="modalTitle">Операция</h2>
+  <div id="modalContent"></div>
+ </div>
 </div>
 
 <script>
-"use strict";
+const tg=window.Telegram?.WebApp;
+if(tg){tg.ready();tg.expand();}
 
-const KEY = "ultimate_seller_kit_v1";
-
-function loadSales(){
-  try{
-    const data=JSON.parse(localStorage.getItem(KEY)||"[]");
-    return Array.isArray(data)?data:[];
-  }catch(e){return []}
-}
-let sales=loadSales();
-
-function save(){
-  try{
-    localStorage.setItem(KEY,JSON.stringify(sales));
-  }catch(e){
-    alert("Не удалось сохранить данные. Проверь свободное место в браузере.");
-  }
-}
-function money(n){
-  return (Number(n)||0).toLocaleString("ru-RU",{maximumFractionDigits:2})+" ₽";
-}
-function num(id){
-  const v=Number(document.getElementById(id).value);
-  return Number.isFinite(v)?v:0;
-}
-function safe(value){
-  return String(value).replace(/[&<>"']/g,c=>({
-    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
-  }[c]));
-}
-function go(page){
-  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
-  document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
-  document.getElementById(page).classList.add("active");
-  document.querySelector('[data-page="'+page+'"]').classList.add("active");
-  window.scrollTo({top:0,behavior:"smooth"});
-  if(page==="sales")renderSales();
-  if(page==="home")renderHome();
-}
-document.querySelectorAll(".tab").forEach(t=>{
-  t.addEventListener("click",()=>go(t.dataset.page));
-});
-
-function output(container,text){
-  document.getElementById(container).innerHTML=
-  '<div class="result"><div class="result-title">ГОТОВЫЙ РЕЗУЛЬТАТ</div>'+
-  '<textarea readonly id="'+container+'Text">'+safe(text)+'</textarea>'+
-  '<div class="actions"><button class="btn full" onclick="copyResult(\''+container+'Text\')">📋 Скопировать текст</button></div></div>';
-}
-async function copyResult(id){
-  const el=document.getElementById(id);
-  if(!el)return;
-  try{
-    await navigator.clipboard.writeText(el.value);
-    alert("Текст скопирован!");
-  }catch(e){
-    el.focus();el.select();
-    try{document.execCommand("copy");alert("Текст скопирован!")}
-    catch(err){alert("Выдели текст и скопируй вручную.")}
-  }
-}
-
-function generateTitle(){
-  const p=document.getElementById("titleProduct").value.trim();
-  const style=document.getElementById("titleStyle").value;
-  if(!p)return alert("Введи название товара.");
-  const variants={
-    premium:[
-      "🔥 "+p+" | PREMIUM EDITION",
-      "💎 "+p+" — качественный цифровой продукт",
-      "⭐ "+p+" | Готовое решение"
-    ],
-    simple:[
-      p+" — готовый продукт",
-      p+" | Исходный файл",
-      p+" — подробная информация внутри"
-    ],
-    attention:[
-      "🚀 "+p+" — забирай прямо сейчас!",
-      "🔥 Ищешь "+p+"? Вот готовое решение!",
-      "⚡ "+p+" | Быстро и удобно"
-    ],
-    professional:[
-      p+" | Профессиональное решение",
-      p+" — цифровой продукт с исходным кодом",
-      p+" | Готовый проект"
-    ]
-  };
-  output("titleResult",variants[style].join("\n"));
-}
-
-function generateDescription(){
-  const p=document.getElementById("descProduct").value.trim();
-  const content=document.getElementById("descContent").value.trim();
-  const price=document.getElementById("descPrice").value.trim();
-  const style=document.getElementById("descStyle").value;
-  if(!p||!content)return alert("Заполни название и комплектацию.");
-  let text="";
-  if(style==="short"){
-    text="🔥 "+p+"\n\n"+content+"\n\nЦена: "+(price?price+" ₽":"уточняйте")+"\n\nПо вопросам покупки обращайтесь к продавцу.";
-  }else if(style==="friendly"){
-    text="Привет! 👋\n\nПредлагаю "+p+"!\n\nЧто входит:\n"+content+"\n\n"+
-    "Цена: "+(price?price+" ₽":"уточняйте")+
-    "\n\nЕсли есть вопросы — пишите, с удовольствием отвечу!";
-  }else{
-    text="💎 "+p.toUpperCase()+"\n\n"+
-    "Представляем готовый цифровой продукт для вашего использования.\n\n"+
-    "📦 ЧТО ВХОДИТ:\n"+content+"\n\n"+
-    "⭐ ПРЕИМУЩЕСТВА:\n"+
-    "• Удобный формат получения\n"+
-    "• Можно использовать после покупки\n"+
-    "• Подробная информация о комплектации\n\n"+
-    "💰 ЦЕНА: "+(price?price+" ₽":"уточняйте")+
-    "\n\n📩 По вопросам покупки и использования обращайтесь к продавцу.";
-  }
-  output("descriptionResult",text);
-}
-
-function generateAd(){
-  const p=document.getElementById("adProduct").value.trim();
-  const b=document.getElementById("adBenefit").value.trim();
-  const price=document.getElementById("adPrice").value.trim();
-  if(!p||!b)return alert("Заполни товар и преимущество.");
-  const text="🚀 НОВИНКА: "+p+"!\n\n"+
-  "✨ Почему стоит обратить внимание?\n"+
-  "• "+b+"\n"+
-  "• Удобный цифровой формат\n"+
-  "• Подробности можно узнать у продавца\n\n"+
-  "💰 Цена: "+(price?price+" ₽":"уточняйте")+
-  "\n\n📩 Пиши в личные сообщения для покупки!";
-  output("adResult",text);
-}
-
-function calculate(){
-  const price=Math.max(0,num("calcPrice"));
-  const fee=Math.min(100,Math.max(0,num("calcFee")));
-  const cost=Math.max(0,num("calcCost"));
-  const commission=price*fee/100;
-  const profit=price-commission-cost;
-  document.getElementById("calcCommission").textContent=money(commission);
-  document.getElementById("calcProfit").textContent=money(profit);
-  document.getElementById("calcTen").textContent=money(profit*10);
-}
-function addSale(){
-  const name=document.getElementById("saleName").value.trim();
-  const price=num("salePrice");
-  const fee=num("saleFee");
-  const cost=num("saleCost");
-  if(!name)return alert("Введи название товара.");
-  if(price<=0)return alert("Цена должна быть больше нуля.");
-  if(fee<0||fee>100||cost<0)return alert("Проверь комиссию и себестоимость.");
-  sales.unshift({
-    id:Date.now()+"-"+Math.random().toString(36).slice(2,7),
-    name,price,fee,cost,
-    date:new Date().toISOString()
-  });
-  save();
-  document.getElementById("saleName").value="";
-  document.getElementById("salePrice").value="";
-  document.getElementById("saleFee").value="0";
-  document.getElementById("saleCost").value="0";
-  renderAll();
-  alert("Продажа добавлена!");
-}
-function profit(s){
-  return s.price*(1-s.fee/100)-s.cost;
-}
-function renderSales(){
-  const box=document.getElementById("salesList");
-  if(!sales.length){
-    box.innerHTML='<div class="empty">Пока нет продаж.<br>Добавь первую операцию выше.</div>';
-    return;
-  }
-  box.innerHTML=sales.map(s=>
-    '<div class="sale-item"><div class="sale-top">'+
-    '<div class="sale-name">'+safe(s.name)+'</div>'+
-    '<strong class="green">'+money(profit(s))+'</strong></div>'+
-    '<div class="sale-meta">'+new Date(s.date).toLocaleString("ru-RU")+
-    ' · Цена: '+money(s.price)+' · Комиссия: '+s.fee+'%</div>'+
-    '<div class="sale-meta">Себестоимость: '+money(s.cost)+'</div>'+
-    '<div class="actions"><button class="btn redbtn" onclick="deleteSale(\''+safe(s.id)+'\')">Удалить</button></div></div>'
-  ).join("");
-}
-function deleteSale(id){
-  if(!confirm("Удалить эту продажу?"))return;
-  sales=sales.filter(s=>s.id!==id);
-  save();renderAll();
-}
-function clearSales(){
-  if(!sales.length)return alert("История уже пустая.");
-  if(!confirm("Удалить всю историю продаж? Это действие нельзя отменить."))return;
-  sales=[];save();renderAll();
-}
-function renderHome(){
-  const box=document.getElementById("recentSales");
-  if(!sales.length){
-    box.innerHTML='<div class="empty">Здесь появятся твои продажи.</div>';
-    return;
-  }
-  box.innerHTML=sales.slice(0,3).map(s=>
-    '<div class="sale-item"><div class="sale-top"><b>'+safe(s.name)+
-    '</b><b class="green">'+money(profit(s))+'</b></div>'+
-    '<div class="sale-meta">'+new Date(s.date).toLocaleDateString("ru-RU")+
-    '</div></div>'
-  ).join("");
-}
-function renderAll(){
-  const revenue=sales.reduce((a,s)=>a+s.price,0);
-  const total=sales.reduce((a,s)=>a+profit(s),0);
-  document.getElementById("totalRevenue").textContent=money(revenue);
-  document.getElementById("totalProfit").textContent=money(total);
-  document.getElementById("totalSales").textContent=sales.length;
-  renderHome();renderSales();
-}
-const tips=[
-"Добавляй скриншоты товара в объявление — покупателю проще понять, что он приобретает.",
-"Чётко указывай формат файла, комплектацию и системные требования.",
-"Не обещай функции, которых нет в товаре. Честное описание помогает получать хорошие отзывы.",
-"Сделай несколько вариантов заголовка и сравни, какой лучше привлекает покупателей.",
-"Храни резервную копию своих проектов и учёта продаж.",
-"Отвечай на вопросы покупателей понятно и без долгих задержек."
+let coins=[
+ {name:'Tether',symbol:'USDT',icon:'₮',cls:'usdt',amount:8450.50,price:1,change:'+0.02%'},
+ {name:'Toncoin',symbol:'TON',icon:'💎',cls:'ton',amount:1200,price:5.24,change:'+2.45%'},
+ {name:'Bitcoin',symbol:'BTC',icon:'₿',cls:'btc',amount:0.025,price:67400,change:'+1.83%'},
+ {name:'Ethereum',symbol:'ETH',icon:'◆',cls:'eth',amount:0.85,price:2400,change:'+0.95%'}
 ];
-function newTip(){
-  document.getElementById("tip").textContent=tips[Math.floor(Math.random()*tips.length)];
-}
+let transactions=[
+ {name:'Пополнение',date:'Сегодня, 12:45',value:'+250 USDT',positive:true},
+ {name:'Отправка',date:'Сегодня, 10:20',value:'-50 USDT',positive:false},
+ {name:'Обмен TON',date:'Вчера, 18:32',value:'+20 TON',positive:true}
+];
 
-function exportData(){
-  const blob=new Blob([JSON.stringify({
-    app:"ULTIMATE SELLER KIT PRO",
-    version:1,
-    exportedAt:new Date().toISOString(),
-    sales
-  },null,2)],{type:"application/json"});
-  const url=URL.createObjectURL(blob);
-  const a=document.createElement("a");
-  a.href=url;a.download="seller-kit-backup.json";
-  document.body.appendChild(a);a.click();a.remove();
-  URL.revokeObjectURL(url);
+function money(n){return '$'+n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})}
+function total(){return coins.reduce((s,c)=>s+c.amount*c.price,0)}
+function renderCoins(id){
+ document.getElementById(id).innerHTML=coins.map(c=>`
+ <div class="coin">
+ <div class="coin-icon ${c.cls}">${c.icon}</div>
+ <div class="coin-info"><div class="coin-name">${c.name}</div><div class="coin-symbol">${c.symbol}</div></div>
+ <div class="coin-price"><div class="coin-amount">${c.amount.toLocaleString('en-US',{maximumFractionDigits:5})}</div><div class="coin-change">${money(c.amount*c.price)}</div></div>
+ </div>`).join('');
 }
-function importData(){
-  const file=document.getElementById("importFile").files[0];
-  if(!file)return alert("Сначала выбери JSON-файл.");
-  const reader=new FileReader();
-  reader.onload=()=>{
-    try{
-      const data=JSON.parse(reader.result);
-      if(!data||!Array.isArray(data.sales))throw new Error("invalid");
-      const valid=data.sales.every(s=>
-        s&&typeof s.name==="string"&&
-        Number.isFinite(Number(s.price))&&
-        Number.isFinite(Number(s.fee))&&
-        Number.isFinite(Number(s.cost))&&
-        Number(s.price)>=0&&Number(s.fee)>=0&&
-        Number(s.fee)<=100&&Number(s.cost)>=0
-      );
-      if(!valid)throw new Error("invalid");
-      if(!confirm("Заменить текущую историю импортированными данными?"))return;
-      sales=data.sales.map(s=>({
-        id:String(s.id||Date.now()+Math.random()),
-        name:s.name,
-        price:Number(s.price),
-        fee:Number(s.fee),
-        cost:Number(s.cost),
-        date:s.date||new Date().toISOString()
-      }));
-      save();renderAll();alert("Данные успешно восстановлены!");
-    }catch(e){alert("Не удалось импортировать файл. Проверь формат резервной копии.")}
-  };
-  reader.readAsText(file);
+function renderTransactions(id){
+ document.getElementById(id).innerHTML=transactions.length?transactions.map(t=>`
+ <div class="transaction">
+ <div class="tx-icon">${t.positive?'↙':'↗'}</div>
+ <div class="tx-info"><div class="tx-name">${t.name}</div><div class="tx-date">${t.date}</div></div>
+ <div class="tx-value ${t.positive?'positive':'negative'}">${t.value}</div>
+ </div>`).join(''):'<div class="empty">Операций пока нет</div>';
 }
-
-calculate();
-renderAll();
+function render(){
+ document.getElementById('total').textContent=money(total());
+ renderCoins('homeCoins');renderCoins('allCoins');
+ renderTransactions('homeTransactions');renderTransactions('allTransactions');
+}
+function showPage(id,btn){
+ document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+ document.getElementById(id).classList.add('active');
+ document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'));
+ if(btn)btn.classList.add('active');
+ else document.querySelectorAll('.nav button')[['home','assets','history','profile'].indexOf(id)].classList.add('active');
+ window.scrollTo(0,0);
+}
+let operation='';
+function openModal(type){
+ operation=type;
+ let title={send:'Отправить',receive:'Получить',exchange:'Обменять'}[type];
+ document.getElementById('modalTitle').textContent=title;
+ let html='';
+ if(type==='send'){
+ html=`<input id="recipient" placeholder="Telegram username получателя">
+ <select id="currency">${coins.map(c=>`<option value="${c.symbol}">${c.symbol}</option>`).join('')}</select>
+ <input id="amount" type="number" placeholder="Сумма" min="0">
+ <button class="primary" onclick="execute()">Продолжить</button>`;
+ }else if(type==='receive'){
+ html=`<p style="color:#aeb4c0;line-height:1.6;margin-bottom:20px">Ваш виртуальный баланс доступен только внутри демонстрации. Реальный адрес блокчейна не создаётся.</p><button class="primary" onclick="closeModal()">Понятно</button>`;
+ }else{
+ html=`<select id="from">${coins.map(c=>`<option value="${c.symbol}">${c.symbol}</option>`).join('')}</select>
+ <div style="text-align:center;margin:5px">⇅</div>
+ <select id="to">${coins.map(c=>`<option value="${c.symbol}">${c.symbol}</option>`).join('')}</select>
+ <input id="amount" type="number" placeholder="Сумма" min="0">
+ <button class="primary" onclick="execute()">Обменять</button>`;
+ }
+ document.getElementById('modalContent').innerHTML=html;
+ document.getElementById('modalBg').classList.add('show');
+}
+function closeModal(){document.getElementById('modalBg').classList.remove('show')}
+function execute(){
+ let amount=Number(document.getElementById('amount')?.value);
+ if(!amount||amount<=0){alert('Введите корректную сумму');return}
+ let date='Сегодня, '+new Date().toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'});
+ if(operation==='send'){
+ let recipient=document.getElementById('recipient').value.trim();
+ let symbol=document.getElementById('currency').value;
+ let c=coins.find(x=>x.symbol===symbol);
+ if(!recipient){alert('Укажите получателя');return}
+ if(amount>c.amount){alert('Недостаточно средств');return}
+ c.amount-=amount;
+ transactions.unshift({name:'Отправка '+recipient,date,value:'-'+amount+' '+symbol,positive:false});
+ }else if(operation==='exchange'){
+ let from=coins.find(x=>x.symbol===document.getElementById('from').value);
+ let to=coins.find(x=>x.symbol===document.getElementById('to').value);
+ if(from===to){alert('Выберите разные валюты');return}
+ if(amount>from.amount){alert('Недостаточно средств');return}
+ let received=amount*from.price/to.price;
+ from.amount-=amount;to.amount+=received;
+ transactions.unshift({name:'Обмен '+from.symbol+' → '+to.symbol,date,value:'+'+received.toFixed(5)+' '+to.symbol,positive:true});
+ }
+ render();closeModal();
+ alert('Демонстрационная операция выполнена!');
+}
+render();
 </script>
 </body>
 </html>
