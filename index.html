@@ -3,945 +3,291 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#0b0b12">
-<title>RUBIX — Gifts & Games</title>
-
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RUBUP GAME</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
-
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-
-body{
- background:#0b0b12;
- color:#fff;
- font-family:Arial,sans-serif;
- min-height:100vh;
- padding-bottom:90px;
-}
-
-button{cursor:pointer;font-family:inherit}
-
-header{
- height:65px;
- display:flex;
- align-items:center;
- justify-content:space-between;
- padding:0 18px;
- background:#11111c;
- border-bottom:1px solid #29293b;
- position:sticky;
- top:0;
- z-index:10;
-}
-
-.logo{
- font-size:24px;
- font-weight:900;
- letter-spacing:3px;
- color:#a78bfa;
-}
-
-.wallet{
- background:#211b35;
- border:1px solid #554080;
- padding:10px 13px;
- border-radius:12px;
- color:#e5d5ff;
- font-weight:bold;
-}
-
-main{
- max-width:550px;
- margin:auto;
- padding:16px;
-}
-
-.page{display:none}
+body{background:#090811;color:white;font-family:Arial,sans-serif}
+.app{max-width:480px;margin:auto;padding:20px 16px 95px}
+header{display:flex;justify-content:space-between;align-items:center;margin-bottom:22px}
+.logo{font-size:29px;font-weight:900;color:#a76bff;letter-spacing:2px}
+.balance{background:#211632;padding:11px;border:1px solid #7443a6;border-radius:12px}
+.card{background:linear-gradient(145deg,#20152f,#100e18);border:1px solid #49305f;border-radius:18px;padding:17px;margin-bottom:15px}
+h2{font-size:19px;margin-bottom:12px}
+small,.muted{color:#a99ab8}
+.profile{display:flex;align-items:center;gap:12px}
+.avatar{font-size:40px}
+.vip{color:#d4a4ff;background:#39204f;padding:6px 10px;border-radius:20px;font-size:11px}
+button{cursor:pointer}
+.btn{width:100%;padding:15px;border:0;border-radius:12px;background:linear-gradient(90deg,#7938ce,#b16aff);color:white;font-weight:bold;margin-top:12px}
+.tabs{position:fixed;bottom:0;left:0;right:0;max-width:480px;margin:auto;background:#15101e;display:flex;justify-content:space-around;padding:15px 4px 22px;border-top:1px solid #49305f;z-index:5}
+.tab{border:0;background:none;color:#93869f;font-size:11px}
+.tab.active{color:#c18aff}
+.tab span{display:block;font-size:21px;margin-bottom:5px}
+.page{display:none;animation:appear .3s}
 .page.active{display:block}
-
-.hero{
- background:linear-gradient(135deg,#39215c,#17172d);
- border:1px solid #63469b;
- border-radius:22px;
- padding:23px;
- margin-bottom:24px;
-}
-
-.hero small{color:#c6a9ff}
-
-.hero h1{
- font-size:32px;
- margin:12px 0;
-}
-
-.hero p{color:#aaa5bd;font-size:13px}
-
-.balance{
- margin-top:20px;
- font-size:28px;
- font-weight:bold;
- color:#ffda79;
-}
-
-h2{
- font-size:21px;
- margin:23px 0 14px;
-}
-
-.muted{color:#9696aa;font-size:13px}
-
-.grid{
- display:grid;
- grid-template-columns:1fr 1fr;
- gap:12px;
-}
-
-.card{
- background:#171722;
- border:1px solid #303044;
- border-radius:18px;
- padding:15px;
- text-align:center;
-}
-
-.case-icon{
- font-size:65px;
- margin:15px 0;
- filter:drop-shadow(0 0 15px #9c70ff66);
-}
-
-.card h3{margin-bottom:8px}
-
-.card p{
- font-size:12px;
- color:#a5a3b7;
- margin-bottom:14px;
-}
-
-.primary{
- width:100%;
- border:0;
- border-radius:12px;
- padding:13px;
- background:linear-gradient(100deg,#8054e9,#aa68e9);
- color:white;
- font-weight:bold;
-}
-
-.primary:active{transform:scale(.97)}
-
-.secondary{
- background:#272337;
- color:#cbb5ff;
- border:1px solid #58437f;
- padding:11px;
- border-radius:11px;
-}
-
-.section{
- background:#171722;
- border:1px solid #303044;
- padding:17px;
- border-radius:17px;
- margin-bottom:14px;
-}
-
-.item{
- display:flex;
- align-items:center;
- justify-content:space-between;
- background:#20202e;
- border:1px solid #35354b;
- border-radius:13px;
- padding:12px;
- margin-bottom:10px;
- gap:8px;
-}
-
-.item-left{
- display:flex;
- align-items:center;
- gap:12px;
-}
-
-.item-emoji{font-size:35px}
-
-.item small{color:#aaa;display:block;margin-top:5px}
-
-.item button{
- background:#7650d6;
- border:0;
- color:white;
- padding:9px;
- border-radius:9px;
-}
-
-.bottom{
- position:fixed;
- bottom:0;
- left:0;
- right:0;
- height:72px;
- background:#11111c;
- border-top:1px solid #303044;
- display:flex;
- justify-content:space-around;
- align-items:center;
- z-index:20;
-}
-
-.bottom button{
- background:none;
- border:0;
- color:#858398;
- font-size:11px;
- display:flex;
- flex-direction:column;
- gap:5px;
- align-items:center;
-}
-
-.bottom button span{font-size:23px}
-
-.bottom button.active{color:#b58cff}
-
-/* РУЛЕТКА */
-
-.roulette{
- background:#171722;
- border:1px solid #38334f;
- border-radius:18px;
- padding:15px;
- margin:15px 0;
- overflow:hidden;
-}
-
-.roulette-title{
- text-align:center;
- color:#bca3ff;
- font-size:12px;
- margin-bottom:13px;
-}
-
-.roulette-window{
- position:relative;
- overflow:hidden;
- height:115px;
- border-radius:12px;
- background:#101019;
- border:1px solid #38334f;
-}
-
-.roulette-window:after{
- content:"";
- position:absolute;
- left:50%;
- top:0;
- bottom:0;
- width:3px;
- background:#ffcf65;
- box-shadow:0 0 12px #ffcf65;
- z-index:3;
-}
-
-.roulette-track{
- display:flex;
- height:100%;
- align-items:center;
- gap:9px;
- width:max-content;
- transform:translateX(0);
-}
-
-.roulette-item{
- flex-shrink:0;
- width:92px;
- height:88px;
- border:1px solid #42415b;
- border-radius:12px;
- display:flex;
- flex-direction:column;
- align-items:center;
- justify-content:center;
- background:#24243a;
-}
-
-.roulette-item span{font-size:34px}
-.roulette-item small{
- font-size:9px;
- color:#c5b9e5;
- margin-top:7px;
-}
-
-@keyframes shine{
- 0%{box-shadow:0 0 0 #a878ff}
- 50%{box-shadow:0 0 30px #a878ff}
- 100%{box-shadow:0 0 0 #a878ff}
-}
-
-.winner{animation:shine 1s infinite}
-
-.result{
- text-align:center;
- padding:17px;
- background:#24203a;
- border:1px solid #7853bc;
- border-radius:15px;
- margin-top:15px;
-}
-
-.result .big{font-size:65px}
-
-/* UPGRADE */
-
-.upgrade-box{
- text-align:center;
- background:#191927;
- padding:20px;
- border:1px solid #38334f;
- border-radius:18px;
-}
-
-.upgrade-item{
- font-size:75px;
- margin:20px;
-}
-
-.progress{
- height:13px;
- background:#303044;
- border-radius:20px;
- overflow:hidden;
- margin:18px 0;
-}
-
-.progress div{
- height:100%;
- width:50%;
- background:linear-gradient(90deg,#7750d9,#d69bff);
- transition:width .4s;
-}
-
-input{
- width:100%;
- background:#101019;
- border:1px solid #49405f;
- color:white;
- padding:13px;
- border-radius:10px;
- margin:12px 0;
-}
-
-.stats{
- display:grid;
- grid-template-columns:1fr 1fr;
- gap:12px;
-}
-
-.stat{
- background:#222133;
- border-radius:13px;
- padding:17px;
-}
-
-.stat strong{
- display:block;
- color:#d0adff;
- font-size:23px;
- margin-top:8px;
-}
-
-.empty{
- text-align:center;
- color:#88879b;
- padding:30px 10px;
-}
-
-button:disabled{opacity:.45}
-
-.toast{
- position:fixed;
- top:80px;
- left:50%;
- transform:translateX(-50%);
- background:#30234b;
- border:1px solid #8a61d6;
- padding:13px 18px;
- border-radius:12px;
- z-index:50;
- display:none;
-}
+@keyframes appear{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.progress{height:10px;background:#392944;border-radius:20px;overflow:hidden;margin:12px 0}
+.progress div{height:100%;background:linear-gradient(90deg,#873dff,#d9aaff);width:0;transition:1s}
+.reel-window{overflow:hidden;border:2px solid #a15aff;border-radius:14px;margin:15px 0}
+.reel{display:flex;gap:9px;width:max-content;padding:10px}
+.reel.spinning{transition:transform 4s cubic-bezier(.1,.75,.1,1)}
+.reel-item{width:85px;height:90px;flex-shrink:0;background:#302044;border:1px solid #8654b5;border-radius:12px;display:grid;place-items:center;font-size:34px}
+.reel-item small{font-size:9px}
+.items{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+.item{background:#21172e;border:1px solid #52386c;border-radius:13px;text-align:center;padding:12px 5px}
+.item .emoji{font-size:35px}
+.item b{display:block;font-size:11px;margin-top:6px}
+.item small{font-size:10px}
+input{width:100%;padding:14px;background:#100d17;border:1px solid #563b70;border-radius:10px;color:white;margin-top:10px}
+.result{font-size:12px;color:#d0a5ff;margin-top:12px}
 </style>
 </head>
-
 <body>
+<div class="app">
 
 <header>
- <div class="logo">RUBIX ✦</div>
- <div class="wallet">🪙 <span id="headerCoins">1000</span></div>
+  <div class="logo">RUBUP</div>
+  <div class="balance">🪙 <b id="balance">10000</b></div>
 </header>
 
-<main>
-
-<!-- ГЛАВНАЯ -->
-
-<section id="home" class="page active">
-
- <div class="hero">
-  <small>WELCOME TO RUBIX</small>
-  <h1>Твоя коллекция начинается здесь.</h1>
-  <p>Открывай кейсы, собирай подарки и улучшай свою коллекцию.</p>
-  <div class="balance">
-   🪙 <span id="mainCoins">1000</span>
+<div class="card profile">
+  <div class="avatar">👾</div>
+  <div>
+    <small>ВАШ ПРОФИЛЬ</small>
+    <h2 id="username">PLAYER</h2>
+    <span class="vip" id="vip">🥉 BRONZE</span>
   </div>
- </div>
+</div>
 
- <h2>🎁 Популярные кейсы</h2>
+<div class="tabs">
+  <button class="tab active" onclick="show('home',this)"><span>🏠</span>Главная</button>
+  <button class="tab" onclick="show('upgrade',this)"><span>🎰</span>Upgrade</button>
+  <button class="tab" onclick="show('inventory',this)"><span>🎁</span>Инвентарь</button>
+  <button class="tab" onclick="show('more',this)"><span>👤</span>Ещё</button>
+</div>
 
- <div class="grid">
-
+<section class="page active" id="home">
   <div class="card">
-   <div class="case-icon">🎁</div>
-   <h3>START CASE</h3>
-   <p>Цена: 100 монет</p>
-   <button class="primary" onclick="openCase(100)">ОТКРЫТЬ</button>
+    <small>WELCOME TO RUBUP</small>
+    <h1 style="font-size:32px;margin:12px 0">Прокачай свою коллекцию</h1>
+    <p class="muted">Собирай подарки, крути Upgrade и повышай VIP.</p>
+    <button class="btn" onclick="show('upgrade')">ОТКРЫТЬ UPGRADE</button>
   </div>
 
   <div class="card">
-   <div class="case-icon">💎</div>
-   <h3>DIAMOND CASE</h3>
-   <p>Цена: 500 монет</p>
-   <button class="primary" onclick="openCase(500)">ОТКРЫТЬ</button>
+    <h2>🏆 VIP STATUS</h2>
+    <h2 id="vipTitle">BRONZE 🥉</h2>
+    <div class="progress"><div id="vipProgress"></div></div>
+    <small id="vipInfo">Оборот прокруток: 0</small>
+    <p class="muted" id="vipNext" style="margin-top:8px"></p>
+  </div>
+
+  <h2>Популярные подарки</h2>
+  <div class="items" id="homeItems"></div>
+</section>
+
+<section class="page" id="upgrade">
+  <div class="card">
+    <h2>🎰 UPGRADE</h2>
+    <p class="muted">Стоимость прокрутки: 5 000 монет</p>
+    <div class="reel-window">
+      <div class="reel" id="reel">
+        <div class="reel-item">🎁<small>GIFT</small></div>
+        <div class="reel-item">👑<small>CROWN</small></div>
+        <div class="reel-item">🐻<small>TEDDY</small></div>
+        <div class="reel-item">💎<small>DIAMOND</small></div>
+        <div class="reel-item">🚀<small>ROCKET</small></div>
+        <div class="reel-item">🎁<small>GIFT</small></div>
+        <div class="reel-item">👑<small>CROWN</small></div>
+        <div class="reel-item">🐻<small>TEDDY</small></div>
+        <div class="reel-item">💎<small>DIAMOND</small></div>
+        <div class="reel-item">🚀<small>ROCKET</small></div>
+      </div>
+    </div>
+    <button class="btn" id="spinButton" onclick="spin()">КРУТИТЬ • 5 000 🪙</button>
+    <div class="result" id="spinResult">Удачи!</div>
+  </div>
+</section>
+
+<section class="page" id="inventory">
+  <div class="card">
+    <h2>🎁 МОЙ ИНВЕНТАРЬ</h2>
+    <div class="items" id="inventoryItems"></div>
+  </div>
+</section>
+
+<section class="page" id="more">
+  <div class="card">
+    <h2>🎟 ПРОМОКОД</h2>
+    <input id="promo" placeholder="Введи промокод">
+    <button class="btn" onclick="activatePromo()">АКТИВИРОВАТЬ</button>
+    <p class="result" id="promoResult"></p>
   </div>
 
   <div class="card">
-   <div class="case-icon">👑</div>
-   <h3>ROYAL CASE</h3>
-   <p>Цена: 1000 монет</p>
-   <button class="primary" onclick="openCase(1000)">ОТКРЫТЬ</button>
+    <h2>👥 РЕФЕРАЛЬНАЯ СИСТЕМА</h2>
+    <p class="muted">Приглашай друзей и получай бонусы.</p>
+    <input id="refLink" readonly>
+    <button class="btn" onclick="copyRef()">СКОПИРОВАТЬ ССЫЛКУ</button>
+    <p class="muted" id="refCount">Приглашено: 0</p>
   </div>
 
   <div class="card">
-   <div class="case-icon">🚀</div>
-   <h3>SPACE CASE</h3>
-   <p>Цена: 2500 монет</p>
-   <button class="primary" onclick="openCase(2500)">ОТКРЫТЬ</button>
+    <h2>📊 СТАТИСТИКА</h2>
+    <p class="muted">Оборот: <b id="turnover">0</b></p>
+    <p class="muted">Предметов: <b id="count">0</b></p>
   </div>
-
- </div>
-
- <div id="caseResult"></div>
-
 </section>
-
-<!-- АПГРЕЙД -->
-
-<section id="upgrade" class="page">
-
- <h2>⚡ Апгрейд подарков</h2>
-
- <div class="upgrade-box">
-
-  <p class="muted">ВЫБЕРИ ПРЕДМЕТ В ИНВЕНТАРЕ</p>
-
-  <div class="upgrade-item" id="upgradeEmoji">🎁</div>
-
-  <h3 id="upgradeName">Предмет не выбран</h3>
-
-  <div class="progress">
-   <div id="upgradeBar"></div>
-  </div>
-
-  <p id="upgradeChance">Шанс успеха: 50%</p>
-
-  <input id="chanceInput" type="number"
-   min="1" max="90" value="50">
-
-  <button class="primary" onclick="upgradeItem()">
-   ⚡ ПОПРОБОВАТЬ АПГРЕЙД
-  </button>
-
-  <p class="muted" style="margin-top:15px">
-   При неудаче предмет теряется. Демонстрационный игровой режим.
-  </p>
-
- </div>
-
-</section>
-
-<!-- ИНВЕНТАРЬ -->
-
-<section id="inventory" class="page">
-
- <h2>🎒 Мой инвентарь</h2>
- <p class="muted">Твои собранные предметы</p>
-
- <div id="inventoryItems"></div>
-
-</section>
-
-<!-- ПРОФИЛЬ -->
-
-<section id="profile" class="page">
-
- <h2>👤 Профиль игрока</h2>
-
- <div class="section">
-  <div style="font-size:45px">👤</div>
-  <h3 id="username">Игрок RUBIX</h3>
-  <p class="muted">Коллекционер RUBIX</p>
- </div>
-
- <div class="stats">
-
-  <div class="stat">
-   <span class="muted">Баланс</span>
-   <strong id="profileCoins">1000</strong>
-  </div>
-
-  <div class="stat">
-   <span class="muted">Предметы</span>
-   <strong id="profileItems">0</strong>
-  </div>
-
-  <div class="stat">
-   <span class="muted">Открыто кейсов</span>
-   <strong id="profileCases">0</strong>
-  </div>
-
-  <div class="stat">
-   <span class="muted">Апгрейды</span>
-   <strong id="profileUpgrades">0</strong>
-  </div>
-
- </div>
-
- <button class="secondary" style="width:100%;margin-top:20px"
- onclick="resetGame()">Сбросить прогресс</button>
-
-</section>
-
-</main>
-
-<!-- НАВИГАЦИЯ -->
-
-<nav class="bottom">
-
- <button class="active" onclick="showPage('home',this)">
-  <span>🎁</span>Кейсы
- </button>
-
- <button onclick="showPage('upgrade',this)">
-  <span>⚡</span>Апгрейд
- </button>
-
- <button onclick="showPage('inventory',this)">
-  <span>🎒</span>Инвентарь
- </button>
-
- <button onclick="showPage('profile',this)">
-  <span>👤</span>Профиль
- </button>
-
-</nav>
-
-<div class="toast" id="toast"></div>
+</div>
 
 <script>
+const tg=window.Telegram?.WebApp;
+tg?.ready();
+tg?.expand();
 
-// =============================
-// СОХРАНЕНИЕ
-// =============================
+let balance=10000;
+let turnover=0;
+let inventory=[];
+let referrals=0;
 
-const defaultData={
- coins:1000,
- inventory:[],
- cases:0,
- upgrades:0
-};
-
-let data;
-
-try{
- data=JSON.parse(localStorage.getItem("rubix_save")) || defaultData;
-}catch{
- data={...defaultData};
-}
-
-if(!Number.isSafeInteger(data.coins)||data.coins<0){
- data.coins=1000;
-}
-
-if(!Array.isArray(data.inventory)) data.inventory=[];
-if(!Number.isSafeInteger(data.cases)) data.cases=0;
-if(!Number.isSafeInteger(data.upgrades)) data.upgrades=0;
-
-let selectedItem=null;
-let spinning=false;
-
-// =============================
-// ПРЕДМЕТЫ
-// =============================
-
-const rewards=[
- {name:"Подарок",emoji:"🎁",value:30,rarity:"Обычный"},
- {name:"Звезда",emoji:"⭐",value:70,rarity:"Обычный"},
- {name:"Серебро",emoji:"🥈",value:120,rarity:"Редкий"},
- {name:"Золотой кубок",emoji:"🏆",value:250,rarity:"Эпический"},
- {name:"Алмаз",emoji:"💎",value:500,rarity:"Легендарный"},
- {name:"Корона",emoji:"👑",value:1000,rarity:"Мифический"},
- {name:"Ракета",emoji:"🚀",value:2000,rarity:"Мифический"},
- {name:"Магический шар",emoji:"🔮",value:5000,rarity:"Секретный"}
+const tiers=[
+ {name:"BRONZE",min:10000,icon:"🥉"},
+ {name:"SILVER",min:50000,icon:"🥈"},
+ {name:"GOLD",min:150000,icon:"🥇"},
+ {name:"PLATINUM",min:500000,icon:"💎"},
+ {name:"DIAMOND",min:1500000,icon:"👑"}
 ];
 
-// =============================
-// СОХРАНЕНИЕ И ИНТЕРФЕЙС
-// =============================
+const gifts=[
+ {name:"Mystery Gift",emoji:"🎁",rating:"7.4"},
+ {name:"Golden Crown",emoji:"👑",rating:"9.1"},
+ {name:"Teddy Bear",emoji:"🐻",rating:"8.2"},
+ {name:"Diamond",emoji:"💎",rating:"9.8"},
+ {name:"Rocket",emoji:"🚀",rating:"8.7"}
+];
 
 function save(){
- localStorage.setItem("rubix_save",JSON.stringify(data));
- update();
+ localStorage.setItem("rubup",JSON.stringify({balance,turnover,inventory,referrals}));
+}
+
+function load(){
+ try{
+  const d=JSON.parse(localStorage.getItem("rubup"));
+  if(d){balance=d.balance;turnover=d.turnover;inventory=d.inventory||[];referrals=d.referrals||0;}
+ }catch(e){}
+}
+
+function show(id,button){
+ document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+ document.getElementById(id).classList.add("active");
+ document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
+ if(button)button.classList.add("active");
 }
 
 function update(){
- document.getElementById("headerCoins").textContent=
- data.coins.toLocaleString("ru-RU");
+ document.getElementById("balance").textContent=balance.toLocaleString("ru-RU");
+ document.getElementById("turnover").textContent=turnover.toLocaleString("ru-RU");
+ document.getElementById("count").textContent=inventory.length;
 
- document.getElementById("mainCoins").textContent=
- data.coins.toLocaleString("ru-RU");
+ let index=-1;
+ tiers.forEach((t,i)=>{if(turnover>=t.min)index=i;});
+ let current=tiers[Math.max(0,index)];
+ let next=tiers[index+1];
 
- document.getElementById("profileCoins").textContent=
- data.coins.toLocaleString("ru-RU");
+ document.getElementById("vip").textContent=current.icon+" "+current.name;
+ document.getElementById("vipTitle").textContent=current.name+" "+current.icon;
+ document.getElementById("vipInfo").textContent="Оборот прокруток: "+turnover.toLocaleString("ru-RU");
 
- document.getElementById("profileItems").textContent=
- data.inventory.length;
+ let previous=index<0?0:current.min;
+ let progress=next?((turnover-previous)/(next.min-previous))*100:100;
+ document.getElementById("vipProgress").style.width=Math.min(100,progress)+"%";
+ document.getElementById("vipNext").textContent=next?
+  "До "+next.name+": "+(next.min-turnover).toLocaleString("ru-RU")+" монет":
+  "Максимальный VIP достигнут!";
 
- document.getElementById("profileCases").textContent=
- data.cases;
-
- document.getElementById("profileUpgrades").textContent=
- data.upgrades;
-
- renderInventory();
-}
-
-function toast(message){
- const el=document.getElementById("toast");
- el.textContent=message;
- el.style.display="block";
-
- clearTimeout(window.toastTimer);
-
- window.toastTimer=setTimeout(()=>{
-  el.style.display="none";
- },2200);
-}
-
-// =============================
-// НАВИГАЦИЯ
-// =============================
-
-function showPage(id,button){
- document.querySelectorAll(".page").forEach(p=>{
-  p.classList.remove("active");
- });
-
- document.getElementById(id).classList.add("active");
-
- document.querySelectorAll(".bottom button").forEach(b=>{
-  b.classList.remove("active");
- });
-
- button.classList.add("active");
-}
-
-// =============================
-// РУЛЕТКА
-// =============================
-
-function openCase(price){
-
- if(spinning)return;
-
- if(data.coins<price){
-  toast("❌ Недостаточно монет!");
-  return;
- }
-
- data.coins-=price;
- data.cases++;
+ renderItems("homeItems",gifts.slice(0,3));
+ renderItems("inventoryItems",inventory);
+ document.getElementById("refCount").textContent="Приглашено: "+referrals;
  save();
+}
 
+function renderItems(id,items){
+ const el=document.getElementById(id);
+ el.innerHTML="";
+ if(!items.length){el.innerHTML='<p class="muted">Пока пусто</p>';return;}
+ items.forEach(g=>{
+  const d=document.createElement("div");
+  d.className="item";
+  d.innerHTML=`<div class="emoji">${g.emoji}</div><b></b><small></small>`;
+  d.querySelector("b").textContent=g.name;
+  d.querySelector("small").textContent="★ "+g.rating;
+  el.appendChild(d);
+ });
+}
+
+let spinning=false;
+function spin(){
+ if(spinning)return;
+ if(balance<5000){document.getElementById("spinResult").textContent="Недостаточно монет!";return;}
  spinning=true;
+ const btn=document.getElementById("spinButton");
+ btn.disabled=true;
+ balance-=5000;
+ document.getElementById("spinResult").textContent="Прокрутка...";
+ update();
 
- const resultBox=document.getElementById("caseResult");
-
- resultBox.innerHTML=`
- <div class="roulette">
-  <div class="roulette-title">🎰 ОТКРЫТИЕ КЕЙСА</div>
-  <div class="roulette-window">
-   <div class="roulette-track" id="rouletteTrack"></div>
-  </div>
-  <p style="text-align:center;margin-top:13px;color:#aaa">
-   Удачи! 🍀
-  </p>
- </div>
- `;
-
- const track=document.getElementById("rouletteTrack");
-
- let winning=rewards[Math.floor(Math.random()*rewards.length)];
-
- let list=[];
-
- for(let i=0;i<35;i++){
-  list.push(rewards[Math.floor(Math.random()*rewards.length)]);
- }
-
- list[30]=winning;
-
- list.forEach(item=>{
-  let el=document.createElement("div");
-  el.className="roulette-item";
-  el.innerHTML=`<span>${item.emoji}</span><small>${item.name}</small>`;
-  track.appendChild(el);
- });
-
- const itemWidth=101;
- const target=30*itemWidth+itemWidth/2-50;
-
- track.style.transition="none";
- track.style.transform="translateX(0)";
-
- requestAnimationFrame(()=>{
-  requestAnimationFrame(()=>{
-   track.style.transition="transform 5s cubic-bezier(.08,.72,.08,1)";
-   track.style.transform=`translateX(-${target}px)`;
-  });
- });
+ const reel=document.getElementById("reel");
+ reel.classList.remove("spinning");
+ reel.style.transform="translateX(0)";
+ const chosen=gifts[Math.floor(Math.random()*gifts.length)];
+ const index=7;
+ reel.classList.add("spinning");
+ reel.style.transform=`translateX(-${index*94}px)`;
 
  setTimeout(()=>{
-  const gift={
-   ...winning,
-   id:Date.now()+Math.random()
-  };
-
-  data.inventory.push(gift);
-  save();
-
+  inventory.push(chosen);
+  turnover+=5000;
+  document.getElementById("spinResult").textContent=
+   "Выпало: "+chosen.emoji+" "+chosen.name+" ★ "+chosen.rating;
+  update();
+  btn.disabled=false;
   spinning=false;
-
-  resultBox.innerHTML=`
-   <div class="result">
-    <div class="big">${winning.emoji}</div>
-    <h3>🎉 ПОЗДРАВЛЯЕМ!</h3>
-    <p style="margin:10px">${winning.name}</p>
-    <p>Редкость: ${winning.rarity}</p>
-    <p style="color:#ffd779;margin-top:8px">
-     Цена: ${winning.value} 🪙
-    </p>
-   </div>
-  `;
-
-  toast("Новый предмет добавлен!");
-
- },5200);
+ },4100);
 }
 
-// =============================
-// ИНВЕНТАРЬ
-// =============================
-
-function renderInventory(){
-
- const box=document.getElementById("inventoryItems");
-
- if(!data.inventory.length){
-  box.innerHTML=`
-   <div class="empty">
-    🎒<br><br>
-    Инвентарь пуст.<br>
-    Открой свой первый кейс!
-   </div>
-  `;
-  return;
- }
-
- box.innerHTML="";
-
- data.inventory.forEach(item=>{
-
-  const row=document.createElement("div");
-  row.className="item";
-
-  const left=document.createElement("div");
-  left.className="item-left";
-
-  const emoji=document.createElement("div");
-  emoji.className="item-emoji";
-  emoji.textContent=item.emoji;
-
-  const info=document.createElement("div");
-  const name=document.createElement("b");
-  name.textContent=item.name;
-
-  const small=document.createElement("small");
-  small.textContent=item.rarity+" · "+item.value+" монет";
-
-  info.append(name,small);
-  left.append(emoji,info);
-
-  const controls=document.createElement("div");
-
-  const upgrade=document.createElement("button");
-  upgrade.textContent="⚡";
-  upgrade.onclick=()=>{
-   selectedItem=item.id;
-   document.getElementById("upgradeEmoji").textContent=item.emoji;
-   document.getElementById("upgradeName").textContent=item.name;
-   document.getElementById("upgradeChance").textContent=
-    "Шанс успеха: "+document.getElementById("chanceInput").value+"%";
-
-   showPage("upgrade",document.querySelectorAll(".bottom button")[1]);
-  };
-
-  const sell=document.createElement("button");
-  sell.textContent="Продать";
-  sell.style.marginLeft="5px";
-  sell.style.background="#59435c";
-
-  sell.onclick=()=>{
-   if(!confirm("Продать предмет за "+item.value+" монет?"))return;
-
-   data.coins+=item.value;
-   data.inventory=data.inventory.filter(x=>x.id!==item.id);
-
-   if(selectedItem===item.id)selectedItem=null;
-
-   save();
-   toast("Предмет продан!");
-  };
-
-  controls.append(upgrade,sell);
-  row.append(left,controls);
-  box.append(row);
- });
-}
-
-// =============================
-// АПГРЕЙД
-// =============================
-
-document.getElementById("chanceInput").addEventListener("input",()=>{
- let chance=Number(document.getElementById("chanceInput").value);
-
- if(Number.isFinite(chance)){
-  document.getElementById("upgradeChance").textContent=
-   "Шанс успеха: "+chance+"%";
-
-  document.getElementById("upgradeBar").style.width=
-   Math.max(0,Math.min(100,chance))+"%";
- }
-});
-
-function upgradeItem(){
-
- const item=data.inventory.find(x=>x.id===selectedItem);
-
- if(!item){
-  toast("Сначала выбери подарок!");
-  return;
- }
-
- const chance=Number(document.getElementById("chanceInput").value);
-
- if(!Number.isFinite(chance)||chance<1||chance>90){
-  toast("Укажи шанс от 1 до 90!");
-  return;
- }
-
- const index=data.inventory.findIndex(x=>x.id===selectedItem);
-
- const better=rewards.filter(x=>x.value>item.value);
-
- if(!better.length){
-  toast("Это максимальный уровень!");
-  return;
- }
-
- const success=Math.random()*100<chance;
-
- if(success){
-
-  const next=better[Math.floor(Math.random()*better.length)];
-
-  data.inventory[index]={
-   ...next,
-   id:Date.now()+Math.random()
-  };
-
-  toast("🎉 АПГРЕЙД УДАЛСЯ!");
-
+function activatePromo(){
+ const code=document.getElementById("promo").value.trim().toUpperCase();
+ const used=JSON.parse(localStorage.getItem("rubupPromos")||"[]");
+ if(code==="WELCOME"&&!used.includes(code)){
+  balance+=1000;
+  used.push(code);
+  localStorage.setItem("rubupPromos",JSON.stringify(used));
+  document.getElementById("promoResult").textContent="Получено 1 000 монет!";
+  update();
  }else{
-
-  data.inventory.splice(index,1);
-
-  toast("😢 Апгрейд не удался!");
-
- }
-
- selectedItem=null;
-
- document.getElementById("upgradeEmoji").textContent="🎁";
- document.getElementById("upgradeName").textContent="Предмет не выбран";
-
- data.upgrades++;
-
- save();
-}
-
-// =============================
-// ПРОФИЛЬ И TELEGRAM
-// =============================
-
-const tg=window.Telegram?.WebApp;
-
-if(tg){
- tg.ready();
- tg.expand();
-
- const user=tg.initDataUnsafe?.user;
-
- if(user){
-  document.getElementById("username").textContent=
-   user.first_name || "Игрок RUBIX";
+  document.getElementById("promoResult").textContent="Промокод неверный или уже использован.";
  }
 }
 
-// =============================
-// СБРОС
-// =============================
-
-function resetGame(){
-
- if(!confirm("Точно сбросить весь прогресс?"))return;
-
- data={
-  coins:1000,
-  inventory:[],
-  cases:0,
-  upgrades:0
- };
-
- selectedItem=null;
-
- save();
- toast("Прогресс сброшен!");
+function copyRef(){
+ const link=document.getElementById("refLink");
+ link.select();
+ navigator.clipboard?.writeText(link.value);
+ document.getElementById("promoResult").textContent="Ссылка скопирована!";
 }
 
-update();
-
+function init(){
+ load();
+ const user=tg?.initDataUnsafe?.user;
+ if(user)document.getElementById("username").textContent=user.username||user.first_name||"PLAYER";
+ const bot="YOUR_BOT_USERNAME";
+ document.getElementById("refLink").value=
+  "https://t.me/"+bot+"?start=ref_demo";
+ update();
+}
+init();
 </script>
 </body>
 </html>
