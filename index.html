@@ -3,45 +3,47 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>RUBUP GAME</title>
-<script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
-body{background:#090811;color:white;font-family:Arial,sans-serif}
-.app{max-width:480px;margin:auto;padding:20px 16px 95px}
-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:22px}
-.logo{font-size:29px;font-weight:900;color:#a76bff;letter-spacing:2px}
-.balance{background:#211632;padding:11px;border:1px solid #7443a6;border-radius:12px}
-.card{background:linear-gradient(145deg,#20152f,#100e18);border:1px solid #49305f;border-radius:18px;padding:17px;margin-bottom:15px}
-h2{font-size:19px;margin-bottom:12px}
-small,.muted{color:#a99ab8}
-.profile{display:flex;align-items:center;gap:12px}
-.avatar{font-size:40px}
-.vip{color:#d4a4ff;background:#39204f;padding:6px 10px;border-radius:20px;font-size:11px}
-button{cursor:pointer}
-.btn{width:100%;padding:15px;border:0;border-radius:12px;background:linear-gradient(90deg,#7938ce,#b16aff);color:white;font-weight:bold;margin-top:12px}
-.tabs{position:fixed;bottom:0;left:0;right:0;max-width:480px;margin:auto;background:#15101e;display:flex;justify-content:space-around;padding:15px 4px 22px;border-top:1px solid #49305f;z-index:5}
-.tab{border:0;background:none;color:#93869f;font-size:11px}
-.tab.active{color:#c18aff}
-.tab span{display:block;font-size:21px;margin-bottom:5px}
-.page{display:none;animation:appear .3s}
-.page.active{display:block}
-@keyframes appear{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
-.progress{height:10px;background:#392944;border-radius:20px;overflow:hidden;margin:12px 0}
-.progress div{height:100%;background:linear-gradient(90deg,#873dff,#d9aaff);width:0;transition:1s}
-.reel-window{overflow:hidden;border:2px solid #a15aff;border-radius:14px;margin:15px 0}
-.reel{display:flex;gap:9px;width:max-content;padding:10px}
-.reel.spinning{transition:transform 4s cubic-bezier(.1,.75,.1,1)}
-.reel-item{width:85px;height:90px;flex-shrink:0;background:#302044;border:1px solid #8654b5;border-radius:12px;display:grid;place-items:center;font-size:34px}
-.reel-item small{font-size:9px}
-.items{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
-.item{background:#21172e;border:1px solid #52386c;border-radius:13px;text-align:center;padding:12px 5px}
-.item .emoji{font-size:35px}
-.item b{display:block;font-size:11px;margin-top:6px}
-.item small{font-size:10px}
-input{width:100%;padding:14px;background:#100d17;border:1px solid #563b70;border-radius:10px;color:white;margin-top:10px}
-.result{font-size:12px;color:#d0a5ff;margin-top:12px}
+*{box-sizing:border-box}
+body{margin:0;background:#100d19;color:white;font-family:Arial,sans-serif;padding:18px}
+.app{max-width:480px;margin:auto}
+header{text-align:center;padding:20px 0}
+.logo{font-size:34px;font-weight:900;color:#b76cff;letter-spacing:3px}
+.subtitle{color:#938ba5;font-size:12px;margin-top:6px}
+.panel{background:#1c1728;border:1px solid #38294d;border-radius:18px;padding:17px;margin-bottom:15px}
+.balance{font-size:13px;color:#aaa1b8}
+.coins{font-size:30px;font-weight:bold;color:#ffd45b;margin-top:6px}
+h2{font-size:18px;margin:0 0 14px}
+button{border:0;border-radius:12px;padding:13px;font-weight:bold;font-size:14px;cursor:pointer}
+button:disabled{opacity:.4;cursor:not-allowed}
+.purple{background:linear-gradient(100deg,#963dff,#c05cff);color:white}
+.gold{background:linear-gradient(100deg,#e8a92e,#ffdc69);color:#281b00}
+.darkbtn{background:#342944;color:white}
+.tabs{display:flex;gap:8px;margin-bottom:15px}
+.tabs button{flex:1;background:#251d32;color:#aaa}
+.tabs button.active{background:#963dff;color:white}
+.gift-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.gift{background:#251e33;border:1px solid #443453;border-radius:15px;padding:13px;text-align:center}
+.gift.selected{border:2px solid #c16aff;background:#30213e}
+.emoji{font-size:43px;margin:8px}
+.gift-name{font-weight:bold;font-size:14px}
+.price{color:#ffd45b;font-size:13px;margin:8px 0}
+.rating{font-size:11px;color:#aaa}
+.gift button{width:100%;margin-top:8px;padding:10px 5px}
+.actions{display:flex;gap:8px;margin-top:12px}
+.actions button{flex:1}
+.upgrade-area{text-align:center;padding:20px 5px}
+.upgrade-items{display:flex;justify-content:center;align-items:center;gap:20px;margin:20px 0}
+.upgrade-item{width:105px;height:110px;background:#2b2139;border:1px solid #65458a;border-radius:17px;display:flex;flex-direction:column;justify-content:center;align-items:center}
+.upgrade-item .emoji{font-size:38px}
+.arrow{font-size:27px;color:#bb69ff}
+#upgradeResult{min-height:24px;color:#ffd45b;margin:14px 0;font-weight:bold}
+.note{font-size:11px;color:#8d829d;line-height:1.5;margin-top:12px}
+.hidden{display:none}
+.empty{color:#968ba5;text-align:center;padding:25px}
+.history{font-size:12px;color:#aaa;line-height:1.8}
 </style>
 </head>
 <body>
@@ -49,245 +51,273 @@ input{width:100%;padding:14px;background:#100d17;border:1px solid #563b70;border
 
 <header>
   <div class="logo">RUBUP</div>
-  <div class="balance">🪙 <b id="balance">10000</b></div>
+  <div class="subtitle">UPGRADE • GIFTS • INVENTORY</div>
 </header>
 
-<div class="card profile">
-  <div class="avatar">👾</div>
-  <div>
-    <small>ВАШ ПРОФИЛЬ</small>
-    <h2 id="username">PLAYER</h2>
-    <span class="vip" id="vip">🥉 BRONZE</span>
-  </div>
+<div class="panel">
+  <div class="balance">ТВОЙ БАЛАНС</div>
+  <div class="coins">🪙 <span id="balance">10000</span></div>
 </div>
 
 <div class="tabs">
-  <button class="tab active" onclick="show('home',this)"><span>🏠</span>Главная</button>
-  <button class="tab" onclick="show('upgrade',this)"><span>🎰</span>Upgrade</button>
-  <button class="tab" onclick="show('inventory',this)"><span>🎁</span>Инвентарь</button>
-  <button class="tab" onclick="show('more',this)"><span>👤</span>Ещё</button>
+  <button class="active" onclick="showTab('inventory',this)">Инвентарь</button>
+  <button onclick="showTab('upgrade',this)">Апгрейд</button>
+  <button onclick="showTab('shop',this)">Магазин</button>
 </div>
 
-<section class="page active" id="home">
-  <div class="card">
-    <small>WELCOME TO RUBUP</small>
-    <h1 style="font-size:32px;margin:12px 0">Прокачай свою коллекцию</h1>
-    <p class="muted">Собирай подарки, крути Upgrade и повышай VIP.</p>
-    <button class="btn" onclick="show('upgrade')">ОТКРЫТЬ UPGRADE</button>
+<section id="inventory">
+  <div class="panel">
+    <h2>🎒 Мои подарки</h2>
+    <div class="gift-grid" id="inventoryGrid"></div>
   </div>
-
-  <div class="card">
-    <h2>🏆 VIP STATUS</h2>
-    <h2 id="vipTitle">BRONZE 🥉</h2>
-    <div class="progress"><div id="vipProgress"></div></div>
-    <small id="vipInfo">Оборот прокруток: 0</small>
-    <p class="muted" id="vipNext" style="margin-top:8px"></p>
-  </div>
-
-  <h2>Популярные подарки</h2>
-  <div class="items" id="homeItems"></div>
 </section>
 
-<section class="page" id="upgrade">
-  <div class="card">
-    <h2>🎰 UPGRADE</h2>
-    <p class="muted">Стоимость прокрутки: 5 000 монет</p>
-    <div class="reel-window">
-      <div class="reel" id="reel">
-        <div class="reel-item">🎁<small>GIFT</small></div>
-        <div class="reel-item">👑<small>CROWN</small></div>
-        <div class="reel-item">🐻<small>TEDDY</small></div>
-        <div class="reel-item">💎<small>DIAMOND</small></div>
-        <div class="reel-item">🚀<small>ROCKET</small></div>
-        <div class="reel-item">🎁<small>GIFT</small></div>
-        <div class="reel-item">👑<small>CROWN</small></div>
-        <div class="reel-item">🐻<small>TEDDY</small></div>
-        <div class="reel-item">💎<small>DIAMOND</small></div>
-        <div class="reel-item">🚀<small>ROCKET</small></div>
+<section id="upgrade" class="hidden">
+  <div class="panel">
+    <h2>⚡ Апгрейд подарка</h2>
+    <div class="upgrade-area">
+      <div class="upgrade-items">
+        <div class="upgrade-item">
+          <div class="emoji" id="fromEmoji">🎁</div>
+          <div id="fromName">Выбери подарок</div>
+        </div>
+        <div class="arrow">➜</div>
+        <div class="upgrade-item">
+          <div class="emoji" id="toEmoji">💎</div>
+          <div id="toName">Новый подарок</div>
+        </div>
       </div>
+      <div id="upgradeResult">Выбери подарок в инвентаре</div>
+      <button class="purple" style="width:100%" id="upgradeButton" onclick="upgradeGift()" disabled>
+        УЛУЧШИТЬ ЗА 500 🪙
+      </button>
+      <div class="note">Шанс успеха — 45%. При неудаче подарок остаётся у тебя. Стоимость попытки списывается.</div>
     </div>
-    <button class="btn" id="spinButton" onclick="spin()">КРУТИТЬ • 5 000 🪙</button>
-    <div class="result" id="spinResult">Удачи!</div>
   </div>
 </section>
 
-<section class="page" id="inventory">
-  <div class="card">
-    <h2>🎁 МОЙ ИНВЕНТАРЬ</h2>
-    <div class="items" id="inventoryItems"></div>
+<section id="shop" class="hidden">
+  <div class="panel">
+    <h2>🎁 Магазин подарков</h2>
+    <div class="gift-grid" id="shopGrid"></div>
   </div>
 </section>
 
-<section class="page" id="more">
-  <div class="card">
-    <h2>🎟 ПРОМОКОД</h2>
-    <input id="promo" placeholder="Введи промокод">
-    <button class="btn" onclick="activatePromo()">АКТИВИРОВАТЬ</button>
-    <p class="result" id="promoResult"></p>
-  </div>
+<div class="panel">
+  <h2>📜 История</h2>
+  <div class="history" id="history">Игра началась!</div>
+</div>
 
-  <div class="card">
-    <h2>👥 РЕФЕРАЛЬНАЯ СИСТЕМА</h2>
-    <p class="muted">Приглашай друзей и получай бонусы.</p>
-    <input id="refLink" readonly>
-    <button class="btn" onclick="copyRef()">СКОПИРОВАТЬ ССЫЛКУ</button>
-    <p class="muted" id="refCount">Приглашено: 0</p>
-  </div>
+<div class="note" style="text-align:center">
+  RUBUP DEMO • Игровые монеты не имеют денежной стоимости.
+</div>
 
-  <div class="card">
-    <h2>📊 СТАТИСТИКА</h2>
-    <p class="muted">Оборот: <b id="turnover">0</b></p>
-    <p class="muted">Предметов: <b id="count">0</b></p>
-  </div>
-</section>
 </div>
 
 <script>
-const tg=window.Telegram?.WebApp;
-tg?.ready();
-tg?.expand();
-
-let balance=10000;
-let turnover=0;
-let inventory=[];
-let referrals=0;
-
-const tiers=[
- {name:"BRONZE",min:10000,icon:"🥉"},
- {name:"SILVER",min:50000,icon:"🥈"},
- {name:"GOLD",min:150000,icon:"🥇"},
- {name:"PLATINUM",min:500000,icon:"💎"},
- {name:"DIAMOND",min:1500000,icon:"👑"}
+const COST = 500;
+const gifts = [
+ {id:1,name:"Мишка",emoji:"🧸",price:500,rating:"7.4"},
+ {id:2,name:"Подарок",emoji:"🎁",price:1000,rating:"8.0"},
+ {id:3,name:"Ракета",emoji:"🚀",price:2000,rating:"8.5"},
+ {id:4,name:"Корона",emoji:"👑",price:4000,rating:"9.1"},
+ {id:5,name:"Алмаз",emoji:"💎",price:8000,rating:"9.8"},
+ {id:6,name:"Золотой кубок",emoji:"🏆",price:15000,rating:"9.9"}
 ];
 
-const gifts=[
- {name:"Mystery Gift",emoji:"🎁",rating:"7.4"},
- {name:"Golden Crown",emoji:"👑",rating:"9.1"},
- {name:"Teddy Bear",emoji:"🐻",rating:"8.2"},
- {name:"Diamond",emoji:"💎",rating:"9.8"},
- {name:"Rocket",emoji:"🚀",rating:"8.7"}
-];
+let state = JSON.parse(localStorage.getItem("rubupSave")) || {
+ balance:10000,
+ inventory:[1,2],
+ history:["Добро пожаловать в RUBUP!"]
+};
+
+let selectedGift = null;
 
 function save(){
- localStorage.setItem("rubup",JSON.stringify({balance,turnover,inventory,referrals}));
+ localStorage.setItem("rubupSave",JSON.stringify(state));
 }
 
-function load(){
- try{
-  const d=JSON.parse(localStorage.getItem("rubup"));
-  if(d){balance=d.balance;turnover=d.turnover;inventory=d.inventory||[];referrals=d.referrals||0;}
- }catch(e){}
-}
-
-function show(id,button){
- document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
- document.getElementById(id).classList.add("active");
- document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
- if(button)button.classList.add("active");
-}
-
-function update(){
- document.getElementById("balance").textContent=balance.toLocaleString("ru-RU");
- document.getElementById("turnover").textContent=turnover.toLocaleString("ru-RU");
- document.getElementById("count").textContent=inventory.length;
-
- let index=-1;
- tiers.forEach((t,i)=>{if(turnover>=t.min)index=i;});
- let current=tiers[Math.max(0,index)];
- let next=tiers[index+1];
-
- document.getElementById("vip").textContent=current.icon+" "+current.name;
- document.getElementById("vipTitle").textContent=current.name+" "+current.icon;
- document.getElementById("vipInfo").textContent="Оборот прокруток: "+turnover.toLocaleString("ru-RU");
-
- let previous=index<0?0:current.min;
- let progress=next?((turnover-previous)/(next.min-previous))*100:100;
- document.getElementById("vipProgress").style.width=Math.min(100,progress)+"%";
- document.getElementById("vipNext").textContent=next?
-  "До "+next.name+": "+(next.min-turnover).toLocaleString("ru-RU")+" монет":
-  "Максимальный VIP достигнут!";
-
- renderItems("homeItems",gifts.slice(0,3));
- renderItems("inventoryItems",inventory);
- document.getElementById("refCount").textContent="Приглашено: "+referrals;
+function log(message){
+ state.history.unshift(message);
+ state.history=state.history.slice(0,8);
+ document.getElementById("history").innerHTML=state.history.join("<br>");
  save();
 }
 
-function renderItems(id,items){
- const el=document.getElementById(id);
- el.innerHTML="";
- if(!items.length){el.innerHTML='<p class="muted">Пока пусто</p>';return;}
- items.forEach(g=>{
-  const d=document.createElement("div");
-  d.className="item";
-  d.innerHTML=`<div class="emoji">${g.emoji}</div><b></b><small></small>`;
-  d.querySelector("b").textContent=g.name;
-  d.querySelector("small").textContent="★ "+g.rating;
-  el.appendChild(d);
+function getGift(id){
+ return gifts.find(g=>g.id===id);
+}
+
+function render(){
+ document.getElementById("balance").textContent=state.balance.toLocaleString("ru-RU");
+
+ const inventory=document.getElementById("inventoryGrid");
+ inventory.innerHTML="";
+
+ if(state.inventory.length===0){
+  inventory.innerHTML='<div class="empty" style="grid-column:span 2">У тебя пока нет подарков</div>';
+ }
+
+ state.inventory.forEach((id,index)=>{
+  const g=getGift(id);
+  if(!g)return;
+
+  const card=document.createElement("div");
+  card.className="gift"+(selectedGift===index?" selected":"");
+  card.innerHTML=`
+   <div class="emoji">${g.emoji}</div>
+   <div class="gift-name">${g.name}</div>
+   <div class="price">🪙 ${g.price.toLocaleString("ru-RU")}</div>
+   <div class="rating">Рейтинг: ${g.rating}/10</div>
+   <button class="gold" onclick="sellGift(${index})">Продать</button>
+   <button class="darkbtn" onclick="selectGift(${index})">Выбрать для апгрейда</button>
+  `;
+  inventory.appendChild(card);
+ });
+
+ document.getElementById("history").innerHTML=state.history.join("<br>");
+ renderShop();
+ renderUpgrade();
+}
+
+function renderShop(){
+ const shop=document.getElementById("shopGrid");
+ shop.innerHTML="";
+
+ gifts.forEach(g=>{
+  const card=document.createElement("div");
+  card.className="gift";
+  card.innerHTML=`
+   <div class="emoji">${g.emoji}</div>
+   <div class="gift-name">${g.name}</div>
+   <div class="price">🪙 ${g.price.toLocaleString("ru-RU")}</div>
+   <div class="rating">Рейтинг: ${g.rating}/10</div>
+   <button class="purple" ${state.balance<g.price?"disabled":""}
+    onclick="buyGift(${g.id})">Купить</button>
+  `;
+  shop.appendChild(card);
  });
 }
 
-let spinning=false;
-function spin(){
- if(spinning)return;
- if(balance<5000){document.getElementById("spinResult").textContent="Недостаточно монет!";return;}
- spinning=true;
- const btn=document.getElementById("spinButton");
- btn.disabled=true;
- balance-=5000;
- document.getElementById("spinResult").textContent="Прокрутка...";
- update();
+function sellGift(index){
+ const id=state.inventory[index];
+ const g=getGift(id);
+ if(!g)return;
 
- const reel=document.getElementById("reel");
- reel.classList.remove("spinning");
- reel.style.transform="translateX(0)";
- const chosen=gifts[Math.floor(Math.random()*gifts.length)];
- const index=7;
- reel.classList.add("spinning");
- reel.style.transform=`translateX(-${index*94}px)`;
+ if(!confirm("Продать "+g.name+" за "+g.price+" монет?"))return;
+
+ state.balance+=g.price;
+ state.inventory.splice(index,1);
+ selectedGift=null;
+
+ log("💰 Продан "+g.name+" за "+g.price+" монет");
+ render();
+}
+
+function buyGift(id){
+ const g=getGift(id);
+ if(state.balance<g.price){
+  alert("Недостаточно монет!");
+  return;
+ }
+
+ state.balance-=g.price;
+ state.inventory.push(id);
+
+ log("🎁 Куплен подарок: "+g.name);
+ render();
+}
+
+function selectGift(index){
+ selectedGift=index;
+ showTab("upgrade",document.querySelectorAll(".tabs button")[1]);
+ render();
+}
+
+function renderUpgrade(){
+ const button=document.getElementById("upgradeButton");
+
+ if(selectedGift===null || !state.inventory[selectedGift]){
+  document.getElementById("fromEmoji").textContent="🎁";
+  document.getElementById("fromName").textContent="Выбери подарок";
+  document.getElementById("toEmoji").textContent="💎";
+  document.getElementById("toName").textContent="Новый подарок";
+  button.disabled=true;
+  return;
+ }
+
+ const current=getGift(state.inventory[selectedGift]);
+ const next=gifts.find(g=>g.price>current.price);
+
+ document.getElementById("fromEmoji").textContent=current.emoji;
+ document.getElementById("fromName").textContent=current.name;
+
+ if(!next){
+  document.getElementById("toEmoji").textContent="🏆";
+  document.getElementById("toName").textContent="Максимум";
+  button.disabled=true;
+  document.getElementById("upgradeResult").textContent="Это самый дорогой подарок!";
+  return;
+ }
+
+ document.getElementById("toEmoji").textContent=next.emoji;
+ document.getElementById("toName").textContent=next.name;
+ button.disabled=state.balance<COST;
+ document.getElementById("upgradeResult").textContent=
+  "Шанс успеха: 45% • Стоимость: "+COST+" монет";
+}
+
+function upgradeGift(){
+ if(selectedGift===null || !state.inventory[selectedGift])return;
+ if(state.balance<COST){
+  alert("Недостаточно монет для апгрейда!");
+  return;
+ }
+
+ const current=getGift(state.inventory[selectedGift]);
+ const next=gifts.find(g=>g.price>current.price);
+
+ if(!next){
+  alert("Это уже максимальный уровень!");
+  return;
+ }
+
+ state.balance-=COST;
+
+ const result=document.getElementById("upgradeResult");
+ const button=document.getElementById("upgradeButton");
+ button.disabled=true;
+ result.textContent="⚡ ПРОКРУТКА...";
 
  setTimeout(()=>{
-  inventory.push(chosen);
-  turnover+=5000;
-  document.getElementById("spinResult").textContent=
-   "Выпало: "+chosen.emoji+" "+chosen.name+" ★ "+chosen.rating;
-  update();
-  btn.disabled=false;
-  spinning=false;
- },4100);
+  const success=Math.random()<0.45;
+
+  if(success){
+   state.inventory[selectedGift]=next.id;
+   result.textContent="🎉 УСПЕХ! Ты получил "+next.name+"!";
+   log("🎉 Апгрейд успешен: "+current.name+" → "+next.name);
+  }else{
+   result.textContent="😢 Не получилось! Подарок остался у тебя.";
+   log("⚡ Неудачный апгрейд подарка "+current.name);
+  }
+
+  save();
+  render();
+ },1200);
 }
 
-function activatePromo(){
- const code=document.getElementById("promo").value.trim().toUpperCase();
- const used=JSON.parse(localStorage.getItem("rubupPromos")||"[]");
- if(code==="WELCOME"&&!used.includes(code)){
-  balance+=1000;
-  used.push(code);
-  localStorage.setItem("rubupPromos",JSON.stringify(used));
-  document.getElementById("promoResult").textContent="Получено 1 000 монет!";
-  update();
- }else{
-  document.getElementById("promoResult").textContent="Промокод неверный или уже использован.";
- }
+function showTab(tab,button){
+ ["inventory","upgrade","shop"].forEach(id=>{
+  document.getElementById(id).classList.toggle("hidden",id!==tab);
+ });
+
+ document.querySelectorAll(".tabs button").forEach(b=>b.classList.remove("active"));
+ if(button)button.classList.add("active");
+
+ if(tab==="upgrade")renderUpgrade();
 }
 
-function copyRef(){
- const link=document.getElementById("refLink");
- link.select();
- navigator.clipboard?.writeText(link.value);
- document.getElementById("promoResult").textContent="Ссылка скопирована!";
-}
-
-function init(){
- load();
- const user=tg?.initDataUnsafe?.user;
- if(user)document.getElementById("username").textContent=user.username||user.first_name||"PLAYER";
- const bot="YOUR_BOT_USERNAME";
- document.getElementById("refLink").value=
-  "https://t.me/"+bot+"?start=ref_demo";
- update();
-}
-init();
+render();
 </script>
 </body>
 </html>
