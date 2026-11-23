@@ -1,159 +1,527 @@
-
 <!DOCTYPE html>
+
 <html lang="ru">
+
 <head>
+
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Coin Clicker</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>RUB CLICK</title>
 
 <style>
-* {
-    box-sizing: border-box;
+
+*{box-sizing:border-box}
+
+body{
+
+ margin:0;background:#090b12;color:white;
+
+ font-family:Arial,sans-serif;padding-bottom:85px
+
 }
 
-body {
-    margin: 0;
-    min-height: 100vh;
-    background: linear-gradient(135deg, #10152d, #25205b);
-    color: white;
-    font-family: Arial, sans-serif;
-    text-align: center;
-    padding: 30px 15px;
+header{
+
+ padding:22px;text-align:center;
+
+ background:#111522;border-bottom:1px solid #292e40
+
 }
 
-.container {
-    max-width: 420px;
-    margin: auto;
-    background: #1b2145;
-    padding: 25px;
-    border-radius: 25px;
-    box-shadow: 0 10px 40px #0008;
+header h1{margin:0;color:#a78bfa;letter-spacing:3px}
+
+header p{color:#9298aa;font-size:12px}
+
+.balance{
+
+ margin:18px auto;background:#171c2b;
+
+ padding:17px;border-radius:16px;
+
+ max-width:420px;text-align:center;
+
+ border:1px solid #343b53
+
 }
 
-h1 {
-    color: #ffd54a;
-    font-size: 32px;
+.balance strong{font-size:27px;color:#ffd45b}
+
+main{max-width:500px;margin:auto;padding:15px}
+
+h2{font-size:20px}
+
+.tabs{display:flex;gap:8px;margin:15px 0}
+
+.tabs button{
+
+ flex:1;background:#191f30;color:#aaa;
+
+ border:1px solid #343b53;border-radius:12px;
+
+ padding:12px 5px;font-weight:bold
+
 }
 
-.balance {
-    font-size: 30px;
-    font-weight: bold;
-    margin: 25px;
-    color: #ffd54a;
+.tabs button.active{background:#7755df;color:white}
+
+.page{display:none}
+
+.page.active{display:block}
+
+.case{
+
+ background:linear-gradient(145deg,#20283d,#111522);
+
+ border:1px solid #343b53;border-radius:18px;
+
+ padding:18px;margin-bottom:14px;text-align:center
+
 }
 
-.coin {
-    width: 190px;
-    height: 190px;
-    border-radius: 50%;
-    border: 8px solid #ffeb8a;
-    background: linear-gradient(145deg, #ffdc4b, #ff9900);
-    color: #754000;
-    font-size: 85px;
-    cursor: pointer;
-    box-shadow: 0 10px 0 #b96a00;
-    transition: 0.1s;
+.case .emoji{font-size:65px;margin:12px}
+
+.case h3{margin:8px}
+
+.case p{color:#aeb5ca}
+
+button.action{
+
+ background:#7957e8;color:white;border:0;
+
+ border-radius:12px;padding:14px;
+
+ width:100%;font-size:15px;font-weight:bold;
+
+ cursor:pointer
+
 }
 
-.coin:active {
-    transform: scale(0.92);
-    box-shadow: 0 3px 0 #b96a00;
+button.action:active{transform:scale(.97)}
+
+button:disabled{opacity:.4}
+
+.result{
+
+ margin:15px 0;padding:20px;
+
+ border-radius:15px;background:#252b40;
+
+ text-align:center;font-size:18px
+
 }
 
-button {
-    border: none;
-    cursor: pointer;
-    font-weight: bold;
+.item{
+
+ background:#191f30;border:1px solid #343b53;
+
+ padding:15px;border-radius:14px;margin:10px 0;
+
+ display:flex;justify-content:space-between;align-items:center
+
 }
 
-.upgrade {
-    width: 100%;
-    padding: 17px;
-    margin-top: 30px;
-    background: #785cff;
-    color: white;
-    border-radius: 15px;
-    font-size: 17px;
+.item small{color:#aaa}
+
+.item button{
+
+ background:#7957e8;color:white;border:0;
+
+ padding:9px;border-radius:8px
+
 }
 
-.upgrade:hover {
-    background: #927cff;
+.upgrade-box{
+
+ background:#191f30;padding:22px;
+
+ border-radius:18px;text-align:center
+
 }
 
-.info {
-    margin-top: 20px;
-    color: #b9c2e8;
-    line-height: 1.8;
+#upgradeItem{font-size:75px;margin:20px}
+
+input{
+
+ width:100%;padding:14px;background:#0e1220;
+
+ color:white;border:1px solid #343b53;
+
+ border-radius:10px;margin:15px 0
+
 }
+
+nav{
+
+ position:fixed;bottom:0;left:0;right:0;
+
+ background:#111522;border-top:1px solid #343b53;
+
+ display:flex;justify-content:space-around;
+
+ padding:13px 3px;
+
+}
+
+nav button{
+
+ background:none;color:#aaa;border:0;
+
+ font-size:12px;display:flex;
+
+ flex-direction:column;gap:5px;align-items:center
+
+}
+
+nav button.active{color:#a78bfa}
+
+nav span{font-size:22px}
+
 </style>
+
 </head>
 
 <body>
 
-<div class="container">
+<header>
 
-    <h1>🪙 COIN CLICKER</h1>
+<h1>RUB CLICK</h1>
 
-    <div class="balance">
-        💰 <span id="coins">0</span>
-    </div>
+<p>YOUR GIFT ADVENTURE</p>
 
-    <button class="coin" onclick="clickCoin()">
-        🪙
-    </button>
+</header>
 
-    <div class="info">
-        ⚡ Сила клика: <span id="power">1</span><br>
-        🏆 Всего заработано: <span id="total">0</span>
-    </div>
+<div class="balance">
 
-    <button class="upgrade" onclick="buyUpgrade()">
-        ⚡ УЛУЧШИТЬ КЛИК<br>
-        Цена: <span id="price">50</span> монет
-    </button>
+<div>ТВОЙ БАЛАНС</div>
+
+<strong>🪙 <span id="coins">1000</span></strong>
 
 </div>
 
+<main>
+
+<section id="cases" class="page active">
+
+<h2>🎁 Кейсы</h2>
+
+<div class="case">
+
+<div class="emoji">📦</div>
+
+<h3>START CASE</h3>
+
+<p>Цена: 100 монет</p>
+
+<button class="action" onclick="openCase(100)">ОТКРЫТЬ КЕЙС</button>
+
+</div>
+
+<div class="case">
+
+<div class="emoji">💎</div>
+
+<h3>DIAMOND CASE</h3>
+
+<p>Цена: 500 монет</p>
+
+<button class="action" onclick="openCase(500)">ОТКРЫТЬ КЕЙС</button>
+
+</div>
+
+<div id="result"></div>
+
+</section>
+
+<section id="upgrade" class="page">
+
+<h2>⚡ Апгрейд</h2>
+
+<div class="upgrade-box">
+
+<p>Выбери предмет из инвентаря</p>
+
+<div id="upgradeItem">🎁</div>
+
+<div id="upgradeName">Предмет не выбран</div>
+
+<input id="chance" type="number" min="1" max="90"
+
+value="50" placeholder="Шанс успеха (%)">
+
+<button class="action" onclick="doUpgrade()">
+
+ПОПРОБОВАТЬ УЛУЧШИТЬ
+
+</button>
+
+<p style="color:#aaa;font-size:12px">
+
+При успехе предмет улучшится, при неудаче он сгорит.
+
+</p>
+
+</div>
+
+</section>
+
+<section id="inventory" class="page">
+
+<h2>🎒 Инвентарь</h2>
+
+<div id="items"></div>
+
+</section>
+
+</main>
+
+<nav>
+
+<button class="active" onclick="showPage('cases',this)">
+
+<span>🎁</span>Кейсы</button>
+
+<button onclick="showPage('upgrade',this)">
+
+<span>⚡</span>Апгрейд</button>
+
+<button onclick="showPage('inventory',this)">
+
+<span>🎒</span>Инвентарь</button>
+
+</nav>
+
 <script>
-let coins = Number(localStorage.getItem("coins")) || 0;
-let power = Number(localStorage.getItem("power")) || 1;
-let total = Number(localStorage.getItem("total")) || 0;
 
-function save() {
-    localStorage.setItem("coins", coins);
-    localStorage.setItem("power", power);
-    localStorage.setItem("total", total);
+let data=JSON.parse(localStorage.getItem("rubclick")) || {
+
+ coins:1000,
+
+ items:[]
+
+};
+
+let selected=null;
+
+const rewards=[
+
+ {name:"Обычная монета",emoji:"🪙",value:30},
+
+ {name:"Серебряный подарок",emoji:"🎁",value:100},
+
+ {name:"Золотой подарок",emoji:"🏆",value:250},
+
+ {name:"Алмаз",emoji:"💎",value:500},
+
+ {name:"Корона",emoji:"👑",value:1000},
+
+ {name:"Редкий кристалл",emoji:"🔮",value:2000}
+
+];
+
+function save(){
+
+ localStorage.setItem("rubclick",JSON.stringify(data));
+
+ update();
+
 }
 
-function update() {
-    document.getElementById("coins").textContent = coins;
-    document.getElementById("power").textContent = power;
-    document.getElementById("total").textContent = total;
-    document.getElementById("price").textContent = power * 50;
+function update(){
+
+ document.getElementById("coins").textContent=data.coins;
+
+ renderItems();
+
 }
 
-function clickCoin() {
-    coins += power;
-    total += power;
-    save();
-    update();
+function showPage(id,btn){
+
+ document.querySelectorAll(".page").forEach(p=>{
+
+  p.classList.remove("active");
+
+ });
+
+ document.getElementById(id).classList.add("active");
+
+ document.querySelectorAll("nav button").forEach(b=>{
+
+  b.classList.remove("active");
+
+ });
+
+ btn.classList.add("active");
+
 }
 
-function buyUpgrade() {
-    let price = power * 50;
+function openCase(price){
 
-    if (coins >= price) {
-        coins -= price;
-        power += 1;
-        save();
-        update();
-    } else {
-        alert("❌ Недостаточно монет!");
-    }
+ if(data.coins<price){
+
+  alert("Недостаточно монет!");
+
+  return;
+
+ }
+
+ data.coins-=price;
+
+ let reward=rewards[Math.floor(Math.random()*rewards.length)];
+
+ data.items.push({
+
+  ...reward,
+
+  id:Date.now()+Math.random()
+
+ });
+
+ save();
+
+ document.getElementById("result").innerHTML=`
+
+ <div class="result">
+
+  <div style="font-size:65px">${reward.emoji}</div>
+
+  <h3>ТЫ ПОЛУЧИЛ!</h3>
+
+  ${reward.name}
+
+  <p>Стоимость: ${reward.value} 🪙</p>
+
+ </div>`;
+
+}
+
+function renderItems(){
+
+ let box=document.getElementById("items");
+
+ if(data.items.length===0){
+
+  box.innerHTML="<p>Инвентарь пока пуст 😢</p>";
+
+  return;
+
+ }
+
+ box.innerHTML="";
+
+ data.items.forEach(item=>{
+
+  let div=document.createElement("div");
+
+  div.className="item";
+
+  let info=document.createElement("div");
+
+  let title=document.createElement("b");
+
+  title.textContent=item.emoji+" "+item.name;
+
+  let price=document.createElement("br");
+
+  let small=document.createElement("small");
+
+  small.textContent=item.value+" монет";
+
+  info.append(title,price,small);
+
+  let btn=document.createElement("button");
+
+  btn.textContent="Выбрать";
+
+  btn.onclick=()=>{
+
+   selected=item.id;
+
+   document.getElementById("upgradeItem").textContent=item.emoji;
+
+   document.getElementById("upgradeName").textContent=item.name;
+
+   showPage("upgrade",document.querySelectorAll("nav button")[1]);
+
+  };
+
+  div.append(info,btn);
+
+  box.append(div);
+
+ });
+
+}
+
+function doUpgrade(){
+
+ let item=data.items.find(x=>x.id===selected);
+
+ if(!item){
+
+  alert("Сначала выбери предмет!");
+
+  return;
+
+ }
+
+ let chance=Number(document.getElementById("chance").value);
+
+ if(!Number.isFinite(chance)||chance<1||chance>90){
+
+  alert("Укажи шанс от 1 до 90!");
+
+  return;
+
+ }
+
+ let index=data.items.findIndex(x=>x.id===selected);
+
+ if(Math.random()*100<chance){
+
+  let next=rewards.find(x=>x.value>item.value);
+
+  if(!next){
+
+   alert("Это максимальный уровень!");
+
+   return;
+
+  }
+
+  data.items[index]={
+
+   ...next,
+
+   id:Date.now()+Math.random()
+
+  };
+
+  alert("🎉 УСПЕХ! Предмет улучшен!");
+
+ }else{
+
+  data.items.splice(index,1);
+
+  alert("😢 Неудача! Предмет потерян.");
+
+ }
+
+ selected=null;
+
+ document.getElementById("upgradeItem").textContent="🎁";
+
+ document.getElementById("upgradeName").textContent="Предмет не выбран";
+
+ save();
+
 }
 
 update();
+
 </script>
 
 </body>
+
 </html>
