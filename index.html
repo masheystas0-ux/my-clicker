@@ -1,13 +1,11 @@
 
 import asyncio
-from aiogram import Bot, Dispatcher, types
+from aiogram import Bot, Dispatcher, F
 from aiogram.filters import Command
-from aiogram.types import (
-    InlineKeyboardMarkup,
-    InlineKeyboardButton
-)
+from aiogram.types import Message, CallbackQuery
+from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
-TOKEN = "ВСТАВЬ_СЮДА_ТОКЕН_БОТА"
+TOKEN = "ТВОЙ_ТОКЕН"
 
 bot = Bot(token=TOKEN)
 dp = Dispatcher()
@@ -16,77 +14,63 @@ players = {}
 
 def get_player(user_id):
     if user_id not in players:
-        players[user_id] = {
-            "coins": 0,
-            "power": 1
-        }
+        players[user_id] = {"coins": 0, "power": 1}
     return players[user_id]
 
 def menu():
     return InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(
-            text="🪙 КЛИК!",
-            callback_data="click"
-        )],
-        [InlineKeyboardButton(
-            text="⚡ Улучшить клик",
-            callback_data="upgrade"
-        )],
-        [InlineKeyboardButton(
-            text="💰 Баланс",
-            callback_data="balance"
-        )]
+        [InlineKeyboardButton(text="🪙 КЛИК", callback_data="click")],
+        [InlineKeyboardButton(text="⚡ Улучшение", callback_data="upgrade")],
+        [InlineKeyboardButton(text="💰 Баланс", callback_data="balance")]
     ])
 
 @dp.message(Command("start"))
-async def start(message: types.Message):
+async def start(message: Message):
     get_player(message.from_user.id)
-
     await message.answer(
-        "🎮 Добро пожаловать в кликер!\n\n"
-        "Нажимай на кнопку и зарабатывай монеты!",
+        "🎮 Добро пожаловать в КЛИКЕР!\nНажимай на кнопку!",
         reply_markup=menu()
     )
 
-@dp.callback_query()
-async def callbacks(call: types.CallbackQuery):
+@dp.callback_query(F.data == "click")
+async def click(call: CallbackQuery):
     player = get_player(call.from_user.id)
+    player["coins"] += player["power"]
 
-    if call.data == "click":
-        player["coins"] += player["power"]
+    await call.answer("🪙 +{}".format(player["power"]))
+    await call.message.edit_text(
+        f"🎮 КЛИКЕР\n\n💰 Монеты: {player['coins']}",
+        reply_markup=menu()
+    )
 
+@dp.callback_query(F.data == "balance")
+async def balance(call: CallbackQuery):
+    player = get_player(call.from_user.id)
+    await call.answer(
+        f"💰 Баланс: {player['coins']} монет",
+        show_alert=True
+    )
+
+@dp.callback_query(F.data == "upgrade")
+async def upgrade(call: CallbackQuery):
+    player = get_player(call.from_user.id)
+    price = player["power"] * 50
+
+    if player["coins"] >= price:
+        player["coins"] -= price
+        player["power"] += 1
+        await call.answer("⚡ Улучшение куплено!")
         await call.message.edit_text(
-            f"🪙 Ты заработал {player['power']} монет!\n\n"
-            f"💰 Баланс: {player['coins']}",
+            f"🎮 КЛИКЕР\n\n"
+            f"💰 Монеты: {player['coins']}\n"
+            f"⚡ За клик: {player['power']}",
             reply_markup=menu()
         )
-
-    elif call.data == "balance":
+    else:
         await call.answer(
-            f"💰 Твой баланс: {player['coins']} монет",
+            f"❌ Нужно {price} монет!",
             show_alert=True
         )
-
-    elif call.data == "upgrade":
-        price = player["power"] * 50
-
-        if player["coins"] >= price:
-            player["coins"] -= price
-            player["power"] += 1
-
-            await call.message.edit_text(
-                "⚡ Улучшение куплено!\n\n"
-                f"🪙 За клик теперь: {player['power']}\n"
-                f"💰 Баланс: {player['coins']}",
-                reply_markup=menu()
-            )
-        else:
-            await call.answer(
-                f"❌ Нужно {price} монет!",
-                show_alert=True
-            )
-
-    await call.answer()
 
 async def main():
     print("Бот запущен!")
