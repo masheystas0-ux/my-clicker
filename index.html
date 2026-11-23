@@ -1,80 +1,159 @@
 
-import asyncio
-from aiogram import Bot, Dispatcher, F
-from aiogram.filters import Command
-from aiogram.types import Message, CallbackQuery
-from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Coin Clicker</title>
 
-TOKEN = "ТВОЙ_ТОКЕН"
+<style>
+* {
+    box-sizing: border-box;
+}
 
-bot = Bot(token=TOKEN)
-dp = Dispatcher()
+body {
+    margin: 0;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #10152d, #25205b);
+    color: white;
+    font-family: Arial, sans-serif;
+    text-align: center;
+    padding: 30px 15px;
+}
 
-players = {}
+.container {
+    max-width: 420px;
+    margin: auto;
+    background: #1b2145;
+    padding: 25px;
+    border-radius: 25px;
+    box-shadow: 0 10px 40px #0008;
+}
 
-def get_player(user_id):
-    if user_id not in players:
-        players[user_id] = {"coins": 0, "power": 1}
-    return players[user_id]
+h1 {
+    color: #ffd54a;
+    font-size: 32px;
+}
 
-def menu():
-    return InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text="🪙 КЛИК", callback_data="click")],
-        [InlineKeyboardButton(text="⚡ Улучшение", callback_data="upgrade")],
-        [InlineKeyboardButton(text="💰 Баланс", callback_data="balance")]
-    ])
+.balance {
+    font-size: 30px;
+    font-weight: bold;
+    margin: 25px;
+    color: #ffd54a;
+}
 
-@dp.message(Command("start"))
-async def start(message: Message):
-    get_player(message.from_user.id)
-    await message.answer(
-        "🎮 Добро пожаловать в КЛИКЕР!\nНажимай на кнопку!",
-        reply_markup=menu()
-    )
+.coin {
+    width: 190px;
+    height: 190px;
+    border-radius: 50%;
+    border: 8px solid #ffeb8a;
+    background: linear-gradient(145deg, #ffdc4b, #ff9900);
+    color: #754000;
+    font-size: 85px;
+    cursor: pointer;
+    box-shadow: 0 10px 0 #b96a00;
+    transition: 0.1s;
+}
 
-@dp.callback_query(F.data == "click")
-async def click(call: CallbackQuery):
-    player = get_player(call.from_user.id)
-    player["coins"] += player["power"]
+.coin:active {
+    transform: scale(0.92);
+    box-shadow: 0 3px 0 #b96a00;
+}
 
-    await call.answer("🪙 +{}".format(player["power"]))
-    await call.message.edit_text(
-        f"🎮 КЛИКЕР\n\n💰 Монеты: {player['coins']}",
-        reply_markup=menu()
-    )
+button {
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+}
 
-@dp.callback_query(F.data == "balance")
-async def balance(call: CallbackQuery):
-    player = get_player(call.from_user.id)
-    await call.answer(
-        f"💰 Баланс: {player['coins']} монет",
-        show_alert=True
-    )
+.upgrade {
+    width: 100%;
+    padding: 17px;
+    margin-top: 30px;
+    background: #785cff;
+    color: white;
+    border-radius: 15px;
+    font-size: 17px;
+}
 
-@dp.callback_query(F.data == "upgrade")
-async def upgrade(call: CallbackQuery):
-    player = get_player(call.from_user.id)
-    price = player["power"] * 50
+.upgrade:hover {
+    background: #927cff;
+}
 
-    if player["coins"] >= price:
-        player["coins"] -= price
-        player["power"] += 1
-        await call.answer("⚡ Улучшение куплено!")
-        await call.message.edit_text(
-            f"🎮 КЛИКЕР\n\n"
-            f"💰 Монеты: {player['coins']}\n"
-            f"⚡ За клик: {player['power']}",
-            reply_markup=menu()
-        )
-    else:
-        await call.answer(
-            f"❌ Нужно {price} монет!",
-            show_alert=True
-        )
+.info {
+    margin-top: 20px;
+    color: #b9c2e8;
+    line-height: 1.8;
+}
+</style>
+</head>
 
-async def main():
-    print("Бот запущен!")
-    await dp.start_polling(bot)
+<body>
 
-if __name__ == "__main__":
-    asyncio.run(main())
+<div class="container">
+
+    <h1>🪙 COIN CLICKER</h1>
+
+    <div class="balance">
+        💰 <span id="coins">0</span>
+    </div>
+
+    <button class="coin" onclick="clickCoin()">
+        🪙
+    </button>
+
+    <div class="info">
+        ⚡ Сила клика: <span id="power">1</span><br>
+        🏆 Всего заработано: <span id="total">0</span>
+    </div>
+
+    <button class="upgrade" onclick="buyUpgrade()">
+        ⚡ УЛУЧШИТЬ КЛИК<br>
+        Цена: <span id="price">50</span> монет
+    </button>
+
+</div>
+
+<script>
+let coins = Number(localStorage.getItem("coins")) || 0;
+let power = Number(localStorage.getItem("power")) || 1;
+let total = Number(localStorage.getItem("total")) || 0;
+
+function save() {
+    localStorage.setItem("coins", coins);
+    localStorage.setItem("power", power);
+    localStorage.setItem("total", total);
+}
+
+function update() {
+    document.getElementById("coins").textContent = coins;
+    document.getElementById("power").textContent = power;
+    document.getElementById("total").textContent = total;
+    document.getElementById("price").textContent = power * 50;
+}
+
+function clickCoin() {
+    coins += power;
+    total += power;
+    save();
+    update();
+}
+
+function buyUpgrade() {
+    let price = power * 50;
+
+    if (coins >= price) {
+        coins -= price;
+        power += 1;
+        save();
+        update();
+    } else {
+        alert("❌ Недостаточно монет!");
+    }
+}
+
+update();
+</script>
+
+</body>
+</html>
